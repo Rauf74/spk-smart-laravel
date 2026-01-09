@@ -7,59 +7,81 @@ use Illuminate\Support\Facades\DB;
 
 class PerangkinganController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
-    }
+        $id_user = \Illuminate\Support\Facades\Auth::id();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // 1. Data Kriteria & Bobot Normalisasi
+        $kriterias = \App\Models\Kriteria::orderBy('kode_kriteria')->get();
+        $totalBobot = $kriterias->sum('bobot');
+        $kriterias->transform(function ($k) use ($totalBobot) {
+            $k->normalisasi = $totalBobot > 0 ? round($k->bobot / $totalBobot, 4) : 0;
+            return $k;
+        });
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // 2. Data Alternatif
+        $alternatifs = \App\Models\Alternatif::orderBy('kode_alternatif')->get();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        // 3. Min/Max Logic
+        $minMaxKriteria = [];
+        foreach ($kriterias as $k) {
+            $nilaiValues = DB::table('penilaian')
+                ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
+                ->where('penilaian.id_user', $id_user)
+                ->where('penilaian.id_kriteria', $k->id_kriteria)
+                ->pluck('subkriteria.nilai')
+                ->toArray();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            if (!empty($nilaiValues)) {
+                $minMaxKriteria[$k->id_kriteria] = [
+                    'min' => min($nilaiValues),
+                    'max' => max($nilaiValues)
+                ];
+            } else {
+                $minMaxKriteria[$k->id_kriteria] = ['min' => 0, 'max' => 0];
+            }
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // 4. Calculate
+        $hasil = $alternatifs->map(function ($alt) use ($id_user, $kriterias, $minMaxKriteria) {
+            $penilaians = DB::table('penilaian')
+                ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
+                ->where('penilaian.id_user', $id_user)
+                ->where('penilaian.id_alternatif', $alt->id_alternatif)
+                ->get();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            $nilaiAkhir = 0;
+
+            foreach ($kriterias as $k) {
+                $p = $penilaians->firstWhere('id_kriteria', $k->id_kriteria);
+                $nilai = $p ? $p->nilai : 0;
+
+                $min = $minMaxKriteria[$k->id_kriteria]['min'];
+                $max = $minMaxKriteria[$k->id_kriteria]['max'];
+                $utility = 0;
+
+                if ($max != $min) {
+                    if ($k->jenis == 'Benefit') {
+                        $utility = ($nilai - $min) / ($max - $min);
+                    } else {
+                        $utility = ($max - $nilai) / ($max - $min);
+                    }
+                } else {
+                    $utility = 1;
+                }
+
+                $nilaiAkhir += ($utility * $k->normalisasi);
+            }
+
+            $alt->nilai_akhir = round($nilaiAkhir, 4);
+            return $alt;
+        });
+
+        // Filter & Sort DESC for Ranking
+        $hasil = $hasil->filter(function ($alt) {
+            return $alt->nilai_akhir > 0;
+        })->sortByDesc('nilai_akhir')->values();
+
+        return view('perangkingan.index', compact('kriterias', 'hasil'));
     }
 }
