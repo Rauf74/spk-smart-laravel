@@ -3,29 +3,44 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Subkriteria;
+use App\Models\Kriteria;
 
+/**
+ * Controller untuk mengelola data Subkriteria.
+ * 
+ * Subkriteria adalah pilihan nilai untuk setiap kriteria.
+ * Contoh untuk kriteria "Akreditasi":
+ * - Sangat Baik (nilai: 5)
+ * - Baik (nilai: 4)
+ * - Cukup (nilai: 3)
+ * - Kurang (nilai: 2)
+ * - Sangat Kurang (nilai: 1)
+ */
 class SubkriteriaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua subkriteria.
      */
     public function index()
     {
-        $subkriterias = \App\Models\Subkriteria::with('kriteria')->get();
+        // Ambil dengan relasi kriteria untuk menampilkan nama kriteria
+        $subkriterias = Subkriteria::with('kriteria')->get();
         return view('subkriteria.index', compact('subkriterias'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form tambah subkriteria.
      */
     public function create()
     {
-        $kriterias = \App\Models\Kriteria::all();
+        // Ambil daftar kriteria untuk dropdown
+        $kriterias = Kriteria::all();
         return view('subkriteria.create', compact('kriterias'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan subkriteria baru ke database.
      */
     public function store(Request $request)
     {
@@ -35,35 +50,37 @@ class SubkriteriaController extends Controller
             'nilai' => 'required|numeric',
         ]);
 
-        \App\Models\Subkriteria::create($request->all());
+        Subkriteria::create($request->all());
 
-        return redirect()->route('subkriteria.index')->with('success', 'Sub Kriteria berhasil ditambahkan.');
+        return redirect()
+            ->route('subkriteria.index')
+            ->with('success', 'Sub Kriteria berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail subkriteria (tidak digunakan).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit subkriteria.
      */
     public function edit(string $id)
     {
-        $subkriteria = \App\Models\Subkriteria::findOrFail($id);
-        $kriterias = \App\Models\Kriteria::all();
+        $subkriteria = Subkriteria::findOrFail($id);
+        $kriterias = Kriteria::all();
         return view('subkriteria.edit', compact('subkriteria', 'kriterias'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data subkriteria di database.
      */
     public function update(Request $request, string $id)
     {
-        $subkriteria = \App\Models\Subkriteria::findOrFail($id);
+        $subkriteria = Subkriteria::findOrFail($id);
 
         $request->validate([
             'id_kriteria' => 'required|exists:kriteria,id_kriteria',
@@ -73,17 +90,21 @@ class SubkriteriaController extends Controller
 
         $subkriteria->update($request->all());
 
-        return redirect()->route('subkriteria.index')->with('success', 'Sub Kriteria berhasil diperbarui.');
+        return redirect()
+            ->route('subkriteria.index')
+            ->with('success', 'Sub Kriteria berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus subkriteria dari database.
      */
     public function destroy(string $id)
     {
-        $subkriteria = \App\Models\Subkriteria::findOrFail($id);
+        $subkriteria = Subkriteria::findOrFail($id);
         $subkriteria->delete();
 
-        return redirect()->route('subkriteria.index')->with('success', 'Sub Kriteria berhasil dihapus.');
+        return redirect()
+            ->route('subkriteria.index')
+            ->with('success', 'Sub Kriteria berhasil dihapus.');
     }
 }

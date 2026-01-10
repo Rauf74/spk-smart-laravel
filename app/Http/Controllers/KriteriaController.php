@@ -3,20 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Kriteria;
 
+/**
+ * Controller untuk mengelola data Kriteria.
+ * 
+ * Kriteria adalah faktor-faktor yang digunakan untuk menilai alternatif.
+ * Contoh: Fasilitas, Akreditasi, Biaya, dll.
+ * 
+ * Setiap kriteria punya:
+ * - kode_kriteria: Kode unik (misal: C1, C2)
+ * - nama_kriteria: Nama lengkap
+ * - jenis: Benefit (semakin tinggi semakin bagus) atau Cost (semakin rendah semakin bagus)
+ * - bobot: Persentase kepentingan (total semua kriteria = 100%)
+ */
 class KriteriaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua kriteria.
      */
     public function index()
     {
-        $kriterias = \App\Models\Kriteria::all();
+        $kriterias = Kriteria::all();
         return view('kriteria.index', compact('kriterias'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form untuk menambah kriteria baru.
      */
     public function create()
     {
@@ -24,10 +37,16 @@ class KriteriaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan kriteria baru ke database.
+     * 
+     * Validasi:
+     * - Kode dan nama harus unik
+     * - Jenis harus Benefit atau Cost
+     * - Bobot 0-100, dan total semua bobot tidak boleh lebih dari 100%
      */
     public function store(Request $request)
     {
+        // Validasi input dasar
         $request->validate([
             'kode_kriteria' => 'required|unique:kriteria,kode_kriteria|max:10',
             'nama_kriteria' => 'required|unique:kriteria,nama_kriteria|max:100',
@@ -35,43 +54,51 @@ class KriteriaController extends Controller
             'bobot' => 'required|numeric|min:0|max:100',
         ]);
 
-        // Validation logic for total bobot
-        $totalBobot = \App\Models\Kriteria::sum('bobot');
-        $newBobot = $request->bobot;
+        // Cek apakah total bobot tidak melebihi 100%
+        $totalBobotSaatIni = Kriteria::sum('bobot');
+        $bobotBaru = $request->bobot;
 
-        if (($totalBobot + $newBobot) > 100) {
-            return back()->withErrors(['bobot' => 'Total bobot melebihi 100%. Total saat ini: ' . $totalBobot . '%'])->withInput();
+        if (($totalBobotSaatIni + $bobotBaru) > 100) {
+            return back()
+                ->withErrors(['bobot' => "Total bobot melebihi 100%. Sisa yang tersedia: " . (100 - $totalBobotSaatIni) . "%"])
+                ->withInput();
         }
 
-        \App\Models\Kriteria::create($request->all());
+        // Simpan ke database
+        Kriteria::create($request->all());
 
-        return redirect()->route('kriteria.index')->with('success', 'Kriteria berhasil ditambahkan.');
+        return redirect()
+            ->route('kriteria.index')
+            ->with('success', 'Kriteria berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail kriteria (tidak digunakan, bisa dikembangkan nanti).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit kriteria.
      */
     public function edit(string $id)
     {
-        $kriteria = \App\Models\Kriteria::findOrFail($id);
+        $kriteria = Kriteria::findOrFail($id);
         return view('kriteria.edit', compact('kriteria'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data kriteria di database.
+     * 
+     * Sama seperti store, tapi perlu exclude bobot lama saat validasi total.
      */
     public function update(Request $request, string $id)
     {
-        $kriteria = \App\Models\Kriteria::findOrFail($id);
+        $kriteria = Kriteria::findOrFail($id);
 
+        // Validasi input (dengan pengecualian untuk unique check)
         $request->validate([
             'kode_kriteria' => 'required|max:10|unique:kriteria,kode_kriteria,' . $id . ',id_kriteria',
             'nama_kriteria' => 'required|max:100|unique:kriteria,nama_kriteria,' . $id . ',id_kriteria',
@@ -79,28 +106,36 @@ class KriteriaController extends Controller
             'bobot' => 'required|numeric|min:0|max:100',
         ]);
 
-        // Validation logic for total bobot
-        $totalBobot = \App\Models\Kriteria::sum('bobot');
-        $oldBobot = $kriteria->bobot;
-        $newBobot = $request->bobot;
+        // Hitung total bobot (tanpa bobot kriteria yang sedang diedit)
+        $totalBobotLain = Kriteria::sum('bobot') - $kriteria->bobot;
+        $bobotBaru = $request->bobot;
 
-        if (($totalBobot - $oldBobot + $newBobot) > 100) {
-            return back()->withErrors(['bobot' => 'Total bobot melebihi 100%. Total saat ini: ' . ($totalBobot - $oldBobot) . '%'])->withInput();
+        if (($totalBobotLain + $bobotBaru) > 100) {
+            return back()
+                ->withErrors(['bobot' => "Total bobot melebihi 100%. Sisa yang tersedia: " . (100 - $totalBobotLain) . "%"])
+                ->withInput();
         }
 
+        // Update database
         $kriteria->update($request->all());
 
-        return redirect()->route('kriteria.index')->with('success', 'Kriteria berhasil diperbarui.');
+        return redirect()
+            ->route('kriteria.index')
+            ->with('success', 'Kriteria berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus kriteria dari database.
+     * 
+     * Catatan: Subkriteria terkait akan ikut terhapus (cascade delete).
      */
     public function destroy(string $id)
     {
-        $kriteria = \App\Models\Kriteria::findOrFail($id);
+        $kriteria = Kriteria::findOrFail($id);
         $kriteria->delete();
 
-        return redirect()->route('kriteria.index')->with('success', 'Kriteria berhasil dihapus.');
+        return redirect()
+            ->route('kriteria.index')
+            ->with('success', 'Kriteria berhasil dihapus.');
     }
 }

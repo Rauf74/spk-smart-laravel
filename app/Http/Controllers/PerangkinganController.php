@@ -3,50 +3,68 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Kriteria;
+use App\Models\Alternatif;
 
+/**
+ * Controller untuk halaman Perangkingan.
+ * 
+ * Menampilkan hasil akhir perhitungan SMART yang sudah diurutkan
+ * dari nilai tertinggi ke terendah (ranking).
+ */
 class PerangkinganController extends Controller
 {
+    /**
+     * Tampilkan halaman perangkingan.
+     * 
+     * Logic sama dengan PerhitunganController, tapi hasilnya diurutkan descending.
+     */
     public function index()
     {
-        $id_user = \Illuminate\Support\Facades\Auth::id();
+        $userId = Auth::id();
 
-        // 1. Data Kriteria & Bobot Normalisasi
-        $kriterias = \App\Models\Kriteria::orderBy('kode_kriteria')->get();
+        // ==============================================
+        // STEP 1: Ambil kriteria dan hitung normalisasi
+        // ==============================================
+        $kriterias = Kriteria::orderBy('kode_kriteria')->get();
         $totalBobot = $kriterias->sum('bobot');
+
         $kriterias->transform(function ($k) use ($totalBobot) {
             $k->normalisasi = $totalBobot > 0 ? round($k->bobot / $totalBobot, 4) : 0;
             return $k;
         });
 
-        // 2. Data Alternatif
-        $alternatifs = \App\Models\Alternatif::orderBy('kode_alternatif')->get();
+        // ==============================================
+        // STEP 2: Ambil alternatif
+        // ==============================================
+        $alternatifs = Alternatif::orderBy('kode_alternatif')->get();
 
-        // 3. Min/Max Logic
-        $minMaxKriteria = [];
+        // ==============================================
+        // STEP 3: Hitung min/max per kriteria
+        // ==============================================
+        $minMaxPerKriteria = [];
         foreach ($kriterias as $k) {
-            $nilaiValues = DB::table('penilaian')
+            $nilaiList = DB::table('penilaian')
                 ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
-                ->where('penilaian.id_user', $id_user)
+                ->where('penilaian.id_user', $userId)
                 ->where('penilaian.id_kriteria', $k->id_kriteria)
                 ->pluck('subkriteria.nilai')
                 ->toArray();
 
-            if (!empty($nilaiValues)) {
-                $minMaxKriteria[$k->id_kriteria] = [
-                    'min' => min($nilaiValues),
-                    'max' => max($nilaiValues)
-                ];
-            } else {
-                $minMaxKriteria[$k->id_kriteria] = ['min' => 0, 'max' => 0];
-            }
+            $minMaxPerKriteria[$k->id_kriteria] = !empty($nilaiList)
+                ? ['min' => min($nilaiList), 'max' => max($nilaiList)]
+                : ['min' => 0, 'max' => 0];
         }
 
-        // 4. Calculate
-        $hasil = $alternatifs->map(function ($alt) use ($id_user, $kriterias, $minMaxKriteria) {
+        // ==============================================
+        // STEP 4: Hitung nilai akhir setiap alternatif
+        // ==============================================
+        $hasil = $alternatifs->map(function ($alt) use ($userId, $kriterias, $minMaxPerKriteria) {
             $penilaians = DB::table('penilaian')
                 ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
-                ->where('penilaian.id_user', $id_user)
+                ->where('penilaian.id_user', $userId)
                 ->where('penilaian.id_alternatif', $alt->id_alternatif)
                 ->get();
 
@@ -56,16 +74,14 @@ class PerangkinganController extends Controller
                 $p = $penilaians->firstWhere('id_kriteria', $k->id_kriteria);
                 $nilai = $p ? $p->nilai : 0;
 
-                $min = $minMaxKriteria[$k->id_kriteria]['min'];
-                $max = $minMaxKriteria[$k->id_kriteria]['max'];
-                $utility = 0;
+                $min = $minMaxPerKriteria[$k->id_kriteria]['min'];
+                $max = $minMaxPerKriteria[$k->id_kriteria]['max'];
 
+                // Hitung utility
                 if ($max != $min) {
-                    if ($k->jenis == 'Benefit') {
-                        $utility = ($nilai - $min) / ($max - $min);
-                    } else {
-                        $utility = ($max - $nilai) / ($max - $min);
-                    }
+                    $utility = ($k->jenis === 'Benefit')
+                        ? ($nilai - $min) / ($max - $min)
+                        : ($max - $nilai) / ($max - $min);
                 } else {
                     $utility = 1;
                 }
@@ -77,10 +93,13 @@ class PerangkinganController extends Controller
             return $alt;
         });
 
-        // Filter & Sort DESC for Ranking
-        $hasil = $hasil->filter(function ($alt) {
-            return $alt->nilai_akhir > 0;
-        })->sortByDesc('nilai_akhir')->values();
+        // ==============================================
+        // STEP 5: Filter dan urutkan (RANKING)
+        // ==============================================
+        $hasil = $hasil
+            ->filter(fn($alt) => $alt->nilai_akhir > 0)  // Hanya yang sudah dinilai
+            ->sortByDesc('nilai_akhir')                   // Urutkan dari tertinggi
+            ->values();                                    // Reset index
 
         return view('perangkingan.index', compact('kriterias', 'hasil'));
     }

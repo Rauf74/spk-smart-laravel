@@ -3,30 +3,42 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pertanyaan;
+use App\Models\Kriteria;
+use App\Models\Alternatif;
 
+/**
+ * Controller untuk mengelola data Pertanyaan.
+ * 
+ * Pertanyaan digunakan dalam form penilaian.
+ * Setiap pertanyaan terkait dengan:
+ * - Satu kriteria (apa yang dinilai)
+ * - Satu alternatif (siapa yang dinilai)
+ */
 class PertanyaanController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua pertanyaan.
      */
     public function index()
     {
-        $pertanyaans = \App\Models\Pertanyaan::with(['kriteria', 'alternatif'])->get();
+        // Ambil dengan relasi untuk menampilkan nama kriteria dan alternatif
+        $pertanyaans = Pertanyaan::with(['kriteria', 'alternatif'])->get();
         return view('pertanyaan.index', compact('pertanyaans'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form tambah pertanyaan.
      */
     public function create()
     {
-        $kriterias = \App\Models\Kriteria::all();
-        $alternatifs = \App\Models\Alternatif::all();
+        $kriterias = Kriteria::all();
+        $alternatifs = Alternatif::all();
         return view('pertanyaan.create', compact('kriterias', 'alternatifs'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan pertanyaan baru ke database.
      */
     public function store(Request $request)
     {
@@ -36,36 +48,38 @@ class PertanyaanController extends Controller
             'teks_pertanyaan' => 'required|string',
         ]);
 
-        \App\Models\Pertanyaan::create($request->all());
+        Pertanyaan::create($request->all());
 
-        return redirect()->route('pertanyaan.index')->with('success', 'Pertanyaan berhasil ditambahkan.');
+        return redirect()
+            ->route('pertanyaan.index')
+            ->with('success', 'Pertanyaan berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail pertanyaan (tidak digunakan).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit pertanyaan.
      */
     public function edit(string $id)
     {
-        $pertanyaan = \App\Models\Pertanyaan::findOrFail($id);
-        $kriterias = \App\Models\Kriteria::all();
-        $alternatifs = \App\Models\Alternatif::all();
+        $pertanyaan = Pertanyaan::findOrFail($id);
+        $kriterias = Kriteria::all();
+        $alternatifs = Alternatif::all();
         return view('pertanyaan.edit', compact('pertanyaan', 'kriterias', 'alternatifs'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data pertanyaan di database.
      */
     public function update(Request $request, string $id)
     {
-        $pertanyaan = \App\Models\Pertanyaan::findOrFail($id);
+        $pertanyaan = Pertanyaan::findOrFail($id);
 
         $request->validate([
             'id_kriteria' => 'required|exists:kriteria,id_kriteria',
@@ -75,17 +89,21 @@ class PertanyaanController extends Controller
 
         $pertanyaan->update($request->all());
 
-        return redirect()->route('pertanyaan.index')->with('success', 'Pertanyaan berhasil diperbarui.');
+        return redirect()
+            ->route('pertanyaan.index')
+            ->with('success', 'Pertanyaan berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus pertanyaan dari database.
      */
     public function destroy(string $id)
     {
-        $pertanyaan = \App\Models\Pertanyaan::findOrFail($id);
+        $pertanyaan = Pertanyaan::findOrFail($id);
         $pertanyaan->delete();
 
-        return redirect()->route('pertanyaan.index')->with('success', 'Pertanyaan berhasil dihapus.');
+        return redirect()
+            ->route('pertanyaan.index')
+            ->with('success', 'Pertanyaan berhasil dihapus.');
     }
 }

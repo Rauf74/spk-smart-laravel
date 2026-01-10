@@ -3,20 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Alternatif;
 
+/**
+ * Controller untuk mengelola data Alternatif.
+ * 
+ * Alternatif adalah pilihan yang akan dinilai/diranking.
+ * Dalam konteks SPK ini, alternatif adalah Program Studi.
+ * Contoh: Teknik Informatika, Sistem Informasi, dll.
+ */
 class AlternatifController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua alternatif.
      */
     public function index()
     {
-        $alternatifs = \App\Models\Alternatif::all();
+        $alternatifs = Alternatif::all();
         return view('alternatif.index', compact('alternatifs'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form tambah alternatif baru.
      */
     public function create()
     {
@@ -24,7 +32,9 @@ class AlternatifController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan alternatif baru ke database.
+     * 
+     * Kode dan nama alternatif harus unik.
      */
     public function store(Request $request)
     {
@@ -33,34 +43,36 @@ class AlternatifController extends Controller
             'nama_alternatif' => 'required|max:100|unique:alternatif,nama_alternatif',
         ]);
 
-        \App\Models\Alternatif::create($request->all());
+        Alternatif::create($request->all());
 
-        return redirect()->route('alternatif.index')->with('success', 'Alternatif berhasil ditambahkan.');
+        return redirect()
+            ->route('alternatif.index')
+            ->with('success', 'Alternatif berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail alternatif (tidak digunakan).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit alternatif.
      */
     public function edit(string $id)
     {
-        $alternatif = \App\Models\Alternatif::findOrFail($id);
+        $alternatif = Alternatif::findOrFail($id);
         return view('alternatif.edit', compact('alternatif'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data alternatif di database.
      */
     public function update(Request $request, string $id)
     {
-        $alternatif = \App\Models\Alternatif::findOrFail($id);
+        $alternatif = Alternatif::findOrFail($id);
 
         $request->validate([
             'kode_alternatif' => 'required|max:10|unique:alternatif,kode_alternatif,' . $id . ',id_alternatif',
@@ -69,17 +81,23 @@ class AlternatifController extends Controller
 
         $alternatif->update($request->all());
 
-        return redirect()->route('alternatif.index')->with('success', 'Alternatif berhasil diperbarui.');
+        return redirect()
+            ->route('alternatif.index')
+            ->with('success', 'Alternatif berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus alternatif dari database.
+     * 
+     * Catatan: Pertanyaan dan penilaian terkait akan ikut terhapus (cascade delete).
      */
     public function destroy(string $id)
     {
-        $alternatif = \App\Models\Alternatif::findOrFail($id);
+        $alternatif = Alternatif::findOrFail($id);
         $alternatif->delete();
 
-        return redirect()->route('alternatif.index')->with('success', 'Alternatif berhasil dihapus.');
+        return redirect()
+            ->route('alternatif.index')
+            ->with('success', 'Alternatif berhasil dihapus.');
     }
 }

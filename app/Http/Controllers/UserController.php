@@ -3,20 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
+/**
+ * Controller untuk mengelola data User.
+ * 
+ * User memiliki 2 role:
+ * - Guru BK: Bisa mengelola semua data (admin)
+ * - Siswa: Hanya bisa mengisi penilaian dan melihat hasil
+ */
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar semua user.
      */
     public function index()
     {
-        $users = \App\Models\User::all();
+        $users = User::all();
         return view('user.index', compact('users'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form tambah user baru.
      */
     public function create()
     {
@@ -24,10 +33,13 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan user baru ke database.
+     * 
+     * Password akan di-hash secara otomatis sebelum disimpan.
      */
     public function store(Request $request)
     {
+        // Validasi input
         $request->validate([
             'nama_user' => 'required|max:100',
             'username' => 'required|max:50|unique:users,username',
@@ -36,39 +48,46 @@ class UserController extends Controller
             'nis' => 'nullable|numeric|unique:users,nis',
         ]);
 
+        // Siapkan data untuk disimpan
         $data = $request->all();
-        $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
-        $data['is_logged_in'] = false; // Default
+        $data['password'] = Hash::make($request->password);  // Hash password
+        $data['is_logged_in'] = false;  // Default: belum login
 
-        \App\Models\User::create($data);
+        // Simpan ke database
+        User::create($data);
 
-        return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan.');
+        return redirect()
+            ->route('user.index')
+            ->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail user (tidak digunakan).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit user.
      */
     public function edit(string $id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
         return view('user.edit', compact('user'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data user di database.
+     * 
+     * Password hanya diupdate jika diisi (tidak wajib saat edit).
      */
     public function update(Request $request, string $id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
 
+        // Aturan validasi dasar
         $rules = [
             'nama_user' => 'required|max:100',
             'username' => 'required|max:50|unique:users,username,' . $id . ',id_user',
@@ -76,31 +95,39 @@ class UserController extends Controller
             'nis' => 'nullable|numeric|unique:users,nis,' . $id . ',id_user',
         ];
 
+        // Password opsional saat edit
         if ($request->filled('password')) {
             $rules['password'] = 'min:6';
         }
 
         $request->validate($rules);
 
+        // Siapkan data (tanpa password dulu)
         $data = $request->except(['password']);
 
+        // Hash password jika diisi
         if ($request->filled('password')) {
-            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+            $data['password'] = Hash::make($request->password);
         }
 
+        // Update database
         $user->update($data);
 
-        return redirect()->route('user.index')->with('success', 'User berhasil diperbarui.');
+        return redirect()
+            ->route('user.index')
+            ->with('success', 'User berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus user dari database.
      */
     public function destroy(string $id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('user.index')->with('success', 'User berhasil dihapus.');
+        return redirect()
+            ->route('user.index')
+            ->with('success', 'User berhasil dihapus.');
     }
 }

@@ -3,24 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Alternatif;
+use App\Models\Pertanyaan;
+use App\Models\Penilaian;
+use App\Models\Subkriteria;
 
+/**
+ * Controller untuk mengelola Penilaian.
+ * 
+ * Penilaian adalah proses siswa menjawab pertanyaan untuk setiap alternatif.
+ * Jawaban disimpan berdasarkan subkriteria yang dipilih.
+ */
 class PenilaianController extends Controller
 {
     /**
-     * Display list of alternatives for user to assess
+     * Tampilkan daftar alternatif dengan status penilaian.
+     * 
+     * Menunjukkan alternatif mana yang sudah dinilai user dan mana yang belum.
      */
     public function index()
     {
-        $id_user = \Illuminate\Support\Facades\Auth::id();
+        $userId = Auth::id();
 
-        // Logic: getAllPenilaianByUser
-        // Get all alternatifs and check if current user has reviewed them
-        $alternatifs = \App\Models\Alternatif::all()->map(function ($alternatif) use ($id_user) {
-            $is_dinilai = \App\Models\Penilaian::where('id_alternatif', $alternatif->id_alternatif)
-                ->where('id_user', $id_user)
+        // Ambil semua alternatif, tambahkan status apakah sudah dinilai
+        $alternatifs = Alternatif::all()->map(function ($alternatif) use ($userId) {
+            // Cek apakah user sudah pernah menilai alternatif ini
+            $sudahDinilai = Penilaian::where('id_alternatif', $alternatif->id_alternatif)
+                ->where('id_user', $userId)
                 ->exists();
-            $alternatif->status_penilaian = $is_dinilai;
+
+            $alternatif->status_penilaian = $sudahDinilai;
             return $alternatif;
         });
 
@@ -28,100 +42,113 @@ class PenilaianController extends Controller
     }
 
     /**
-     * Show the assessment form for specific alternatif
+     * Tampilkan form penilaian untuk alternatif tertentu.
+     * 
+     * Form berisi pertanyaan-pertanyaan yang harus dijawab.
+     * Setiap pertanyaan punya pilihan jawaban berupa subkriteria.
      */
     public function create(string $id_alternatif)
     {
-        $alternatif = \App\Models\Alternatif::findOrFail($id_alternatif);
+        $alternatif = Alternatif::findOrFail($id_alternatif);
 
-        // Get Pertanyaan by Alternatif with Kriteria
-        $pertanyaans = \App\Models\Pertanyaan::with(['kriteria.subkriteria'])
+        // Ambil pertanyaan untuk alternatif ini, beserta kriteria dan subkriterianya
+        $pertanyaans = Pertanyaan::with(['kriteria.subkriteria'])
             ->where('id_alternatif', $id_alternatif)
             ->get()
-            ->sortBy(function ($query) {
-                return $query->kriteria->nama_kriteria;
+            ->sortBy(function ($p) {
+                return $p->kriteria->nama_kriteria;
             });
 
-        // Group by Kriteria for easier display in view if needed
         return view('penilaian.create', compact('alternatif', 'pertanyaans'));
     }
 
     /**
-     * Store assessment data
+     * Simpan penilaian ke database.
+     * 
+     * Strategi: Hapus penilaian lama (jika ada), lalu insert yang baru.
+     * Ini memungkinkan user mengulang penilaian.
      */
     public function store(Request $request)
     {
+        // Validasi input
         $request->validate([
             'id_alternatif' => 'required|exists:alternatif,id_alternatif',
-            'jawaban' => 'required|array', // Array of [id_pertanyaan => id_subkriteria]
+            'jawaban' => 'required|array',  // Format: [id_pertanyaan => id_subkriteria]
             'jawaban.*' => 'exists:subkriteria,id_subkriteria',
         ]);
 
-        $id_user = \Illuminate\Support\Facades\Auth::id();
-        $id_alternatif = $request->id_alternatif;
+        $userId = Auth::id();
+        $idAlternatif = $request->id_alternatif;
 
+        // Gunakan transaction untuk menjaga konsistensi data
         DB::beginTransaction();
+
         try {
-            // Delete existing penilaian for this user & alternatif (Override method)
-            \App\Models\Penilaian::where('id_user', $id_user)
-                ->where('id_alternatif', $id_alternatif)
+            // Hapus penilaian lama untuk alternatif ini (jika ada)
+            Penilaian::where('id_user', $userId)
+                ->where('id_alternatif', $idAlternatif)
                 ->delete();
 
-            foreach ($request->jawaban as $id_pertanyaan => $id_subkriteria) {
-                // Get related data needed for the table
-                $pertanyaan = \App\Models\Pertanyaan::find($id_pertanyaan);
-                $subkriteria = \App\Models\Subkriteria::find($id_subkriteria);
+            // Simpan penilaian baru
+            foreach ($request->jawaban as $idPertanyaan => $idSubkriteria) {
+                // Ambil data relasi yang dibutuhkan
+                $pertanyaan = Pertanyaan::find($idPertanyaan);
+                $subkriteria = Subkriteria::find($idSubkriteria);
 
-                // Insert
-                \App\Models\Penilaian::create([
-                    'id_user' => $id_user,
-                    'id_alternatif' => $id_alternatif,
-                    'id_kriteria' => $pertanyaan->id_kriteria, // From pertanyaan relation
-                    'id_pertanyaan' => $id_pertanyaan,
-                    'id_subkriteria' => $id_subkriteria,
-                    'jawaban' => $subkriteria->nilai // Value from subkriteria
+                // Insert ke tabel penilaian
+                Penilaian::create([
+                    'id_user' => $userId,
+                    'id_alternatif' => $idAlternatif,
+                    'id_kriteria' => $pertanyaan->id_kriteria,
+                    'id_pertanyaan' => $idPertanyaan,
+                    'id_subkriteria' => $idSubkriteria,
+                    'jawaban' => $subkriteria->nilai,  // Nilai numerik dari subkriteria
                 ]);
             }
 
             DB::commit();
-            return redirect()->route('penilaian.index')->with('success', 'Penilaian berhasil disimpan.');
+
+            return redirect()
+                ->route('penilaian.index')
+                ->with('success', 'Penilaian berhasil disimpan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan penilaian: ' . $e->getMessage()]);
+
+            return back()
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail penilaian (tidak digunakan).
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Redirect ke form create untuk mengulang penilaian.
      */
     public function edit(string $id)
     {
-        // Typically penilaian is re-taken, so redirect to create
         return redirect()->route('penilaian.create', $id);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update penilaian (tidak digunakan, pakai store dengan override).
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Tidak digunakan - penilaian diupdate via store
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus penilaian (tidak digunakan).
      */
     public function destroy(string $id)
     {
-        //
+        // Belum diimplementasi
     }
 }

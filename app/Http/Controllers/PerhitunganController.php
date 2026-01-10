@@ -3,110 +3,190 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Kriteria;
+use App\Models\Alternatif;
 
+/**
+ * Controller untuk halaman Perhitungan SMART.
+ * 
+ * Metode SMART (Simple Multi-Attribute Rating Technique):
+ * 1. Normalisasi bobot kriteria (bobot / total bobot)
+ * 2. Hitung nilai utility tiap alternatif per kriteria
+ * 3. Kalikan utility dengan bobot normalisasi
+ * 4. Jumlahkan untuk dapat nilai akhir
+ */
 class PerhitunganController extends Controller
 {
+    /**
+     * Tampilkan halaman perhitungan SMART.
+     * 
+     * Logika ini sama persis dengan fungsi legacy:
+     * - getCombinedKriteriaData() untuk normalisasi bobot
+     * - getNilaiUtilityAlternatif() untuk hitung utility
+     * - getNilaiAkhirAlternatif() untuk nilai akhir
+     */
     public function index()
     {
-        $id_user = \Illuminate\Support\Facades\Auth::id();
+        // Ambil ID user yang sedang login
+        $userId = Auth::id();
 
-        // 1. Data Kriteria & Bobot Normalisasi
-        $kriterias = \App\Models\Kriteria::orderBy('kode_kriteria')->get();
+        // ==============================================
+        // STEP 1: Ambil data kriteria & hitung normalisasi bobot
+        // Rumus: normalisasi = bobot / total_bobot
+        // ==============================================
+        $kriterias = Kriteria::orderBy('kode_kriteria')->get();
         $totalBobot = $kriterias->sum('bobot');
-        $kriterias->transform(function ($k) use ($totalBobot) {
-            $k->normalisasi = $totalBobot > 0 ? round($k->bobot / $totalBobot, 4) : 0;
-            return $k;
+
+        // Tambahkan property 'normalisasi' ke setiap kriteria
+        $kriterias->transform(function ($kriteria) use ($totalBobot) {
+            $kriteria->normalisasi = $totalBobot > 0
+                ? round($kriteria->bobot / $totalBobot, 4)
+                : 0;
+            return $kriteria;
         });
 
-        // 2. Data Alternatif
-        $alternatifs = \App\Models\Alternatif::orderBy('kode_alternatif')->get();
+        // ==============================================
+        // STEP 2: Ambil data alternatif
+        // ==============================================
+        $alternatifs = Alternatif::orderBy('kode_alternatif')->get();
 
-        // 3. Ambil rata-rata nilai per alternatif per kriteria (Nilai Dasar)
-        // Kita butuh min/max per kriteria untuk rumus Utility
-        $minMaxKriteria = [];
-        foreach ($kriterias as $k) {
-            // Cari nilai min/max dari seluruh penilaian yang ada untuk kriteria ini (global scope or user scope?)
-            // Berdasarkan logic legacy 'getNilaiUtilityAlternatif', dia query penilaian p WHERE p.id_user = ?
-            // Jadi min/max dihitung dari data penilaian user tersebut saja.
+        // ==============================================
+        // STEP 3: Cari nilai MIN dan MAX per kriteria
+        // Ini dibutuhkan untuk rumus utility
+        // Scope: hanya dari penilaian user yang login
+        // ==============================================
+        $minMaxPerKriteria = $this->hitungMinMaxPerKriteria($kriterias, $userId);
 
-            $nilaiValues = DB::table('penilaian')
-                ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
-                ->where('penilaian.id_user', $id_user)
-                ->where('penilaian.id_kriteria', $k->id_kriteria)
-                ->pluck('subkriteria.nilai')
-                ->toArray();
-
-            if (!empty($nilaiValues)) {
-                $minMaxKriteria[$k->id_kriteria] = [
-                    'min' => min($nilaiValues),
-                    'max' => max($nilaiValues)
-                ];
-            } else {
-                $minMaxKriteria[$k->id_kriteria] = ['min' => 0, 'max' => 0];
-            }
-        }
-
-        // 4. Hitung Utility & Nilai Akhir per Alternatif
-        $hasil = $alternatifs->map(function ($alt) use ($id_user, $kriterias, $minMaxKriteria) {
-            // Ambil nilai penilaian user untuk alternatif ini
-            $penilaians = DB::table('penilaian')
-                ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
-                ->where('penilaian.id_user', $id_user)
-                ->where('penilaian.id_alternatif', $alt->id_alternatif)
-                ->get();
-
-            // Map nilai per kriteria
-            $nilaiPerKriteria = []; // Utk debugging/display nilai mentah
-            $utilities = []; // Nilai utility
-            $nilaiAkhir = 0;
-
-            foreach ($kriterias as $k) {
-                // Cari nilai untuk kriteria ini
-                $p = $penilaians->firstWhere('id_kriteria', $k->id_kriteria);
-                $nilai = $p ? $p->nilai : 0; // Default 0 jika belum dinilai
-
-                $nilaiPerKriteria[$k->kode_kriteria] = $nilai;
-
-                // Hitung Utility
-                $min = $minMaxKriteria[$k->id_kriteria]['min'];
-                $max = $minMaxKriteria[$k->id_kriteria]['max'];
-                $utility = 0;
-
-                if ($max != $min) {
-                    if ($k->jenis == 'Benefit') {
-                        $utility = ($nilai - $min) / ($max - $min);
-                    } else {
-                        $utility = ($max - $nilai) / ($max - $min);
-                    }
-                } else {
-                    $utility = 1; // Jika min == max, utility = 1
-                }
-
-                $utilities[$k->kode_kriteria] = round($utility, 4);
-
-                // Hitung ui * ai (Utility * Bobot Normalisasi)
-                $nilaiAkhir += ($utility * $k->normalisasi);
-            }
-
-            $alt->nilai_kriteria = $nilaiPerKriteria;
-            $alt->utilities = $utilities;
-            $alt->nilai_akhir = round($nilaiAkhir, 4);
-
-            return $alt;
+        // ==============================================
+        // STEP 4: Hitung utility dan nilai akhir tiap alternatif
+        // ==============================================
+        $hasil = $alternatifs->map(function ($alternatif) use ($userId, $kriterias, $minMaxPerKriteria) {
+            return $this->hitungNilaiAlternatif($alternatif, $userId, $kriterias, $minMaxPerKriteria);
         });
 
-        // Filter: Hanya tampilkan alternatif yang sudah dinilai (ada minimal 1 nilai > 0)
-        // Atau legacy logic menampilkan semua? Legacy sepertinya join penilaian, jadi kalau gak ada penilaian gak muncul.
-        // Kita filter yang punya nilai akhir > 0 atau punya data penilaian.
+        // Filter: hanya tampilkan yang sudah ada penilaiannya
         $hasil = $hasil->filter(function ($alt) {
-            // Cek apakah user pernah menilai alternatif ini
-            // Sederhananya, jika nilai utilities tidak kosong/0. Tapi karena default 0, kita cek apakah ada penilaian.
-            // Di map diatas kita query DB per alternatif (N+1 issue but okay for small SPK).
-            // Better Optimization: Eager load diawal. Tapi biarkan dulu demi akurasi logic.
-            return count($alt->utilities) > 0;
+            return $alt->nilai_akhir > 0;
         });
 
         return view('perhitungan.index', compact('kriterias', 'hasil'));
+    }
+
+    /**
+     * Hitung nilai MIN dan MAX untuk setiap kriteria.
+     * Data diambil dari tabel penilaian (join subkriteria).
+     * 
+     * @param Collection $kriterias - Daftar kriteria
+     * @param int $userId - ID user yang login
+     * @return array - Format: [id_kriteria => ['min' => x, 'max' => y]]
+     */
+    private function hitungMinMaxPerKriteria($kriterias, $userId)
+    {
+        $result = [];
+
+        foreach ($kriterias as $kriteria) {
+            // Ambil semua nilai dari penilaian user untuk kriteria ini
+            $nilaiList = DB::table('penilaian')
+                ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
+                ->where('penilaian.id_user', $userId)
+                ->where('penilaian.id_kriteria', $kriteria->id_kriteria)
+                ->pluck('subkriteria.nilai')
+                ->toArray();
+
+            // Jika ada data, cari min dan max
+            if (!empty($nilaiList)) {
+                $result[$kriteria->id_kriteria] = [
+                    'min' => min($nilaiList),
+                    'max' => max($nilaiList),
+                ];
+            } else {
+                $result[$kriteria->id_kriteria] = [
+                    'min' => 0,
+                    'max' => 0,
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Hitung nilai utility dan nilai akhir untuk satu alternatif.
+     * 
+     * Rumus Utility:
+     * - Benefit: (nilai - min) / (max - min)
+     * - Cost:    (max - nilai) / (max - min)
+     * 
+     * Rumus Nilai Akhir:
+     * - Sum dari (utility * normalisasi bobot) untuk semua kriteria
+     * 
+     * @param Alternatif $alternatif
+     * @param int $userId
+     * @param Collection $kriterias
+     * @param array $minMaxPerKriteria
+     * @return Alternatif - Dengan tambahan property: utilities, nilai_akhir
+     */
+    private function hitungNilaiAlternatif($alternatif, $userId, $kriterias, $minMaxPerKriteria)
+    {
+        // Ambil semua penilaian user untuk alternatif ini
+        $penilaianList = DB::table('penilaian')
+            ->join('subkriteria', 'penilaian.id_subkriteria', '=', 'subkriteria.id_subkriteria')
+            ->where('penilaian.id_user', $userId)
+            ->where('penilaian.id_alternatif', $alternatif->id_alternatif)
+            ->get();
+
+        $utilities = [];
+        $nilaiAkhir = 0;
+
+        foreach ($kriterias as $kriteria) {
+            // Cari nilai untuk kriteria ini
+            $penilaian = $penilaianList->firstWhere('id_kriteria', $kriteria->id_kriteria);
+            $nilai = $penilaian ? $penilaian->nilai : 0;
+
+            // Ambil min dan max untuk kriteria ini
+            $min = $minMaxPerKriteria[$kriteria->id_kriteria]['min'];
+            $max = $minMaxPerKriteria[$kriteria->id_kriteria]['max'];
+
+            // Hitung utility
+            $utility = $this->hitungUtility($nilai, $min, $max, $kriteria->jenis);
+            $utilities[$kriteria->kode_kriteria] = $utility;
+
+            // Tambahkan ke nilai akhir: utility * normalisasi
+            $nilaiAkhir += ($utility * $kriteria->normalisasi);
+        }
+
+        // Simpan hasil ke object alternatif
+        $alternatif->utilities = $utilities;
+        $alternatif->nilai_akhir = round($nilaiAkhir, 4);
+
+        return $alternatif;
+    }
+
+    /**
+     * Hitung nilai utility untuk satu nilai.
+     * 
+     * @param float $nilai - Nilai yang akan dihitung
+     * @param float $min - Nilai minimum dalam dataset
+     * @param float $max - Nilai maksimum dalam dataset
+     * @param string $jenis - 'Benefit' atau 'Cost'
+     * @return float - Nilai utility (0-1)
+     */
+    private function hitungUtility($nilai, $min, $max, $jenis)
+    {
+        // Jika min == max, utility = 1 (semua nilai sama)
+        if ($max == $min) {
+            return 1;
+        }
+
+        // Rumus utility berbeda untuk Benefit dan Cost
+        if ($jenis === 'Benefit') {
+            // Benefit: semakin tinggi semakin bagus
+            return round(($nilai - $min) / ($max - $min), 4);
+        } else {
+            // Cost: semakin rendah semakin bagus
+            return round(($max - $nilai) / ($max - $min), 4);
+        }
     }
 }
