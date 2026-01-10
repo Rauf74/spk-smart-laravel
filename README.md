@@ -148,9 +148,9 @@ Aplikasi akan berjalan di `http://localhost:8000`
 | Eloquent Models | ✅ Selesai | 6 model dengan relationships |
 | Controllers | ✅ Selesai | 10 controller (CRUD + SMART logic) |
 | Routes | ✅ Selesai | RESTful routes |
+| Seeder | ✅ Selesai | Data contoh dari SQL lama |
 | Views (Blade) | 🔄 In Progress | Belum dimulai |
 | Assets (CSS/JS) | ⏳ Pending | Bootstrap + ApexCharts |
-| Seeder | ⏳ Pending | Data contoh |
 | Deployment | ⏳ Pending | Render + Supabase |
 
 ## 🔐 Roles & Permissions
