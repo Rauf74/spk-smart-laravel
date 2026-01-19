@@ -149,8 +149,9 @@ Aplikasi akan berjalan di `http://localhost:8000`
 | Controllers | ✅ Selesai | 10 controller (CRUD + SMART logic) |
 | Routes | ✅ Selesai | RESTful routes |
 | Seeder | ✅ Selesai | Data contoh dari SQL lama |
-| Views (Blade) | 🔄 In Progress | Belum dimulai |
-| Assets (CSS/JS) | ⏳ Pending | Bootstrap + ApexCharts |
+| Views (Blade) | ✅ Selesai | 12 halaman + layout + partials |
+| Assets (CSS/JS) | ✅ Selesai | Bootstrap + ApexCharts + DataTables |
+| Testing | 🔄 In Progress | Perlu testing manual |
 | Deployment | ⏳ Pending | Render + Supabase |
 
 ## 🔐 Roles & Permissions
