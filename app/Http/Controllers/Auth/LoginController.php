@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 /**
- * Controller untuk autentikasi user (Login & Logout).
+ * Controller untuk autentikasi user (Login, Register & Logout).
  * 
  * Logic ini mengikuti sistem legacy:
  * - Login menggunakan username dan password
@@ -25,67 +27,78 @@ class LoginController extends Controller
     }
 
     /**
+     * Tampilkan halaman register.
+     */
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    /**
      * Proses login user.
-     * 
-     * Validasi:
-     * - Username dan password wajib diisi
-     * - Cek kredensial dengan Auth::attempt()
-     * 
-     * Jika berhasil:
-     * - Regenerate session (security)
-     * - Set is_logged_in = true
-     * - Redirect ke dashboard
      */
     public function login(Request $request)
     {
-        // Validasi input
         $credentials = $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        // Coba login
         if (Auth::attempt($credentials)) {
-            // Regenerate session untuk keamanan
             $request->session()->regenerate();
-
-            // Update flag is_logged_in (untuk kompatibilitas dengan legacy)
             $user = Auth::user();
             $user->is_logged_in = true;
             $user->save();
-
-            // Redirect ke halaman yang diminta, atau dashboard
             return redirect()->intended('/');
         }
 
-        // Jika gagal, kembali dengan error
         return back()
             ->withErrors(['username' => 'Username atau password salah.'])
             ->onlyInput('username');
     }
 
     /**
+     * Proses registrasi user baru.
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'nama_user' => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:users,username',
+            'password' => 'required|string|min:6|confirmed',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'nis' => 'nullable|string|max:20|unique:users,nis',
+        ]);
+
+        $user = User::create([
+            'nama_user' => $request->nama_user,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'role' => 'Siswa',
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'nis' => $request->nis,
+            'is_logged_in' => false,
+        ]);
+
+        Auth::login($user);
+        $user->is_logged_in = true;
+        $user->save();
+
+        return redirect('/');
+    }
+
+    /**
      * Proses logout user.
-     * 
-     * Langkah:
-     * - Set is_logged_in = false
-     * - Logout dari Auth
-     * - Invalidate session
-     * - Regenerate CSRF token
      */
     public function logout(Request $request)
     {
-        // Update flag sebelum logout
         $user = Auth::user();
         if ($user) {
             $user->is_logged_in = false;
             $user->save();
         }
 
-        // Logout
         Auth::logout();
-
-        // Bersihkan session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
