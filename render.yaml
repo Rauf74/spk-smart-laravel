@@ -1,0 +1,19 @@
+# render.yaml - Konfigurasi untuk Render.com
+services:
+  - type: web
+    name: spk-smart-laravel
+    runtime: docker
+    plan: free
+    envVars:
+      - key: APP_NAME
+        value: "SPK SMART Laravel"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        sync: false  # Set manual di Render dashboard

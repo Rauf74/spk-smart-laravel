@@ -1,0 +1,16 @@
+# .dockerignore - File yang tidak perlu di-copy ke Docker
+.git
+.gitignore
+.env
+.env.backup
+node_modules
+vendor
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+*.md
+*.log
+.DS_Store
+Thumbs.db
