@@ -2,6 +2,10 @@
 
 @section('title', 'Form Penilaian - SPK SMART')
 
+@php
+    /** @var \App\Models\Alternatif $alternatif */
+@endphp
+
 @section('content')
 <div class="container-fluid">
     <h1 class="mb-4">Form Penilaian: {{ $alternatif->nama_alternatif }}</h1>

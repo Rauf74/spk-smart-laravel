@@ -2,6 +2,10 @@
 
 @section('title', 'Profile - SPK SMART')
 
+@php
+    /** @var \App\Models\User $user */
+@endphp
+
 @section('content')
     <div class="container-fluid">
         <!-- Breadcrumb & Header -->
