@@ -30,7 +30,8 @@
 
     <!-- Statistics Cards -->
     <div class="row">
-        <div class="col-lg-3 col-md-6">
+        <!-- Common Stats -->
+        <div class="{{ Auth::user()->role === 'Siswa' ? 'col-lg-6' : 'col-lg-3' }} col-md-6">
             <div class="card">
                 <div class="card-body">
                     <div class="row align-items-start">
@@ -51,28 +52,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-start">
-                        <div class="col-8">
-                            <h5 class="card-title mb-9 fw-semibold">Sub Kriteria</h5>
-                            <h4 class="fw-semibold mb-3">{{ $total_subkriteria }}</h4>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-flex justify-content-end">
-                                <div
-                                    class="text-white bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-                                    <i class="ti ti-list fs-6"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
+        <div class="{{ Auth::user()->role === 'Siswa' ? 'col-lg-6' : 'col-lg-3' }} col-md-6">
             <div class="card">
                 <div class="card-body">
                     <div class="row align-items-start">
@@ -93,26 +73,50 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-start">
-                        <div class="col-8">
-                            <h5 class="card-title mb-9 fw-semibold">Siswa Menilai</h5>
-                            <h4 class="fw-semibold mb-3">{{ $total_penilaian }} dari {{ $total_siswa }}</h4>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-flex justify-content-end">
-                                <div
-                                    class="text-white bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-                                    <i class="ti ti-check fs-6"></i>
+        <!-- Admin Only Stats (Guru BK) -->
+        @if(Auth::user()->role === 'Guru BK')
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-start">
+                            <div class="col-8">
+                                <h5 class="card-title mb-9 fw-semibold">Sub Kriteria</h5>
+                                <h4 class="fw-semibold mb-3">{{ $total_subkriteria }}</h4>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-flex justify-content-end">
+                                    <div
+                                        class="text-white bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-list fs-6"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-start">
+                            <div class="col-8">
+                                <h5 class="card-title mb-9 fw-semibold">Siswa Menilai</h5>
+                                <h4 class="fw-semibold mb-3">{{ $total_penilaian }} dari {{ $total_siswa }}</h4>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-flex justify-content-end">
+                                    <div
+                                        class="text-white bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-check fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <!-- Charts Section -->
@@ -150,89 +154,90 @@
 
     <!-- Information Row -->
     <div class="row">
-        <!-- System Information -->
-        <div class="col-lg-4 d-flex align-items-strech">
-            <div class="card w-100">
-                <div class="card-body">
-                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-                        <div class="mb-3 mb-sm-0">
-                            <h5 class="card-title fw-semibold">Informasi Sistem</h5>
+        <!-- Admin Only Info (System Info & Recent Activities) -->
+        @if(Auth::user()->role === 'Guru BK')
+            <div class="col-lg-4 d-flex align-items-strech">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                            <div class="mb-3 mb-sm-0">
+                                <h5 class="card-title fw-semibold">Informasi Sistem</h5>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-8">
-                            <h4 class="fw-semibold mb-3">{{ $total_users }}</h4>
-                            <div class="d-flex align-items-center mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <h4 class="fw-semibold mb-3">{{ $total_users }}</h4>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span
+                                        class="me-1 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-users text-danger"></i>
+                                    </span>
+                                    <p class="text-dark me-1 fs-3 mb-0">Total Users</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-flex justify-content-center">
+                                    <div id="breakup"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-2">
                                 <span
-                                    class="me-1 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
-                                    <i class="ti ti-users text-danger"></i>
+                                    class="me-2 rounded-circle bg-light-primary round-20 d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-calculator text-primary"></i>
                                 </span>
-                                <p class="text-dark me-1 fs-3 mb-0">Total Users</p>
+                                <p class="mb-0 fs-3">Metode SMART</p>
                             </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-flex justify-content-center">
-                                <div id="breakup"></div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span
+                                    class="me-2 rounded-circle bg-light-warning round-20 d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-database text-warning"></i>
+                                </span>
+                                <p class="mb-0 fs-3">Database Connected</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <span
-                                class="me-2 rounded-circle bg-light-primary round-20 d-flex align-items-center justify-content-center">
-                                <i class="ti ti-calculator text-primary"></i>
-                            </span>
-                            <p class="mb-0 fs-3">Metode SMART</p>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <span
-                                class="me-2 rounded-circle bg-light-warning round-20 d-flex align-items-center justify-content-center">
-                                <i class="ti ti-database text-warning"></i>
-                            </span>
-                            <p class="mb-0 fs-3">Database Connected</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <span
-                                class="me-2 rounded-circle bg-light-info round-20 d-flex align-items-center justify-content-center">
-                                <i class="ti ti-chart-bar text-info"></i>
-                            </span>
-                            <p class="mb-0 fs-3">Rata-rata Bobot: {{ $avg_bobot }}%</p>
+                            <div class="d-flex align-items-center">
+                                <span
+                                    class="me-2 rounded-circle bg-light-info round-20 d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-chart-bar text-info"></i>
+                                </span>
+                                <p class="mb-0 fs-3">Rata-rata Bobot: {{ $avg_bobot }}%</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Recent Activities -->
-        <div class="col-lg-4 d-flex align-items-strech">
-            <div class="card w-100">
-                <div class="card-body">
-                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-                        <div class="mb-3 mb-sm-0">
-                            <h5 class="card-title fw-semibold">Aktivitas Terbaru</h5>
-                        </div>
-                    </div>
-                    @foreach($recent_activities as $activity)
-                        <div class="d-flex align-items-center pb-9">
-                            <span
-                                class="me-3 round-48 bg-light-{{ $activity['color'] }} rounded-circle d-flex align-items-center justify-content-center">
-                                <i class="{{ $activity['icon'] }} text-{{ $activity['color'] }}"></i>
-                            </span>
-                            <div>
-                                <h6 class="mb-1 fw-semibold fs-3">{!! $activity['action'] !!}</h6>
-                                <p class="mb-0 text-muted">{{ $activity['time'] }}</p>
+            <div class="col-lg-4 d-flex align-items-strech">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                            <div class="mb-3 mb-sm-0">
+                                <h5 class="card-title fw-semibold">Aktivitas Terbaru</h5>
                             </div>
                         </div>
-                    @endforeach
-                    <div class="py-6 px-6 text-center">
-                        <p class="mb-0 fs-4">Menampilkan 4 aktivitas terbaru</p>
+                        @foreach($recent_activities as $activity)
+                            <div class="d-flex align-items-center pb-9">
+                                <span
+                                    class="me-3 round-48 bg-light-{{ $activity['color'] }} rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="{{ $activity['icon'] }} text-{{ $activity['color'] }}"></i>
+                                </span>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold fs-3">{!! $activity['action'] !!}</h6>
+                                    <p class="mb-0 text-muted">{{ $activity['time'] }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                        <div class="py-6 px-6 text-center">
+                            <p class="mb-0 fs-4">Menampilkan 4 aktivitas terbaru</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
 
         <!-- Quick Actions & Latest Program Studi -->
-        <div class="col-lg-4 d-flex align-items-strech">
+        <div class="{{ Auth::user()->role === 'Siswa' ? 'col-lg-12' : 'col-lg-4' }} d-flex align-items-strech">
             <div class="card w-100">
                 <div class="card-body">
                     <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
@@ -240,21 +245,25 @@
                             <h5 class="card-title fw-semibold">Program Studi Terbaru</h5>
                         </div>
                     </div>
-                    @if($alternatif_terbaru->count() > 0)
-                        @foreach($alternatif_terbaru->take(4) as $alternatif)
-                            <div class="d-flex align-items-center pb-9">
-                                <span
-                                    class="me-3 round-48 bg-light-success rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="ti ti-building text-success"></i>
-                                </span>
-                                <div>
-                                    <h6 class="mb-1 fw-semibold fs-3">
-                                        {{ $alternatif->nama_alternatif }}
-                                    </h6>
-                                    <p class="mb-0 text-muted">Program Studi</p>
+                    @if(count($alternatif_terbaru) > 0)
+                        <div class="row">
+                            @foreach($alternatif_terbaru as $alternatif)
+                                <div class="{{ Auth::user()->role === 'Siswa' ? 'col-md-3' : 'col-12' }}">
+                                    <div class="d-flex align-items-center pb-9">
+                                        <span
+                                            class="me-3 round-48 bg-light-success rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-building text-success"></i>
+                                        </span>
+                                        <div>
+                                            <h6 class="mb-1 fw-semibold fs-3">
+                                                {{ $alternatif->nama_alternatif }}
+                                            </h6>
+                                            <p class="mb-0 text-muted">Program Studi</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     @else
                         <div class="text-center py-4">
                             <i class="ti ti-building-store fs-4 text-muted"></i>
