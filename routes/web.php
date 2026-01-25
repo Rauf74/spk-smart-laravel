@@ -29,17 +29,26 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Master Data
-    Route::resource('kriteria', KriteriaController::class);
-    Route::resource('subkriteria', SubkriteriaController::class);
-    Route::resource('alternatif', AlternatifController::class);
-    Route::resource('pertanyaan', PertanyaanController::class);
-    Route::resource('user', UserController::class);
-
-    // SPK Logic
+    // SPK Logic (Accessible by Siswa & Guru BK)
     Route::get('penilaian/create/{id_alternatif}', [PenilaianController::class, 'create'])->name('penilaian.create');
     Route::delete('penilaian/destroyPerAlternatif', [PenilaianController::class, 'destroyPerAlternatif'])->name('penilaian.destroyPerAlternatif');
     Route::resource('penilaian', PenilaianController::class)->only(['index', 'store', 'edit']);
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
+
+    // Master Data (ADMIN ONLY - Guru BK)
+    Route::middleware([
+        function ($request, $next) {
+            if (\Illuminate\Support\Facades\Auth::user()->role !== 'Guru BK') {
+                abort(403, 'Akses Ditolak. Halaman ini hanya untuk Guru BK.');
+            }
+            return $next($request);
+        }
+    ])->group(function () {
+        Route::resource('kriteria', KriteriaController::class);
+        Route::resource('subkriteria', SubkriteriaController::class);
+        Route::resource('alternatif', AlternatifController::class);
+        Route::resource('pertanyaan', PertanyaanController::class);
+        Route::resource('user', UserController::class);
+    });
 });
