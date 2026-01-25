@@ -30,47 +30,49 @@
         </button>
 
         <div class="py-6 text-center">
-            <table id="myTableKriteria" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Kriteria</th>
-                        <th>Nama Kriteria</th>
-                        <th>Jenis (Benefit/Cost)</th>
-                        <th>Bobot (%)</th>
-                        <th>Aksi (Ubah/Hapus)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($kriterias as $index => $kriteria)
+            <div class="table-responsive">
+                <table id="myTableKriteria" class="display" style="width:100%">
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $kriteria->kode_kriteria }}</td>
-                            <td>{{ $kriteria->nama_kriteria }}</td>
-                            <td>
-                                <span class="badge {{ $kriteria->jenis == 'Benefit' ? 'bg-success' : 'bg-warning' }}">
-                                    {{ $kriteria->jenis }}
-                                </span>
-                            </td>
-                            <td>{{ $kriteria->bobot }}%</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="editKriteria({{ $kriteria->id_kriteria }}, '{{ $kriteria->kode_kriteria }}', '{{ $kriteria->nama_kriteria }}', '{{ $kriteria->jenis }}', '{{ $kriteria->bobot }}')">
-                                    <i class="ti ti-edit"></i> Ubah
-                                </button>
-                                <form action="{{ route('kriteria.destroy', $kriteria->id_kriteria) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
+                            <th>No</th>
+                            <th>Kode Kriteria</th>
+                            <th>Nama Kriteria</th>
+                            <th>Jenis (Benefit/Cost)</th>
+                            <th>Bobot (%)</th>
+                            <th>Aksi (Ubah/Hapus)</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($kriterias as $index => $kriteria)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $kriteria->kode_kriteria }}</td>
+                                <td>{{ $kriteria->nama_kriteria }}</td>
+                                <td>
+                                    <span class="badge {{ $kriteria->jenis == 'Benefit' ? 'bg-success' : 'bg-warning' }}">
+                                        {{ $kriteria->jenis }}
+                                    </span>
+                                </td>
+                                <td>{{ $kriteria->bobot }}%</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"
+                                        onclick="editKriteria({{ $kriteria->id_kriteria }}, '{{ $kriteria->kode_kriteria }}', '{{ $kriteria->nama_kriteria }}', '{{ $kriteria->jenis }}', '{{ $kriteria->bobot }}')">
+                                        <i class="ti ti-edit"></i> Ubah
+                                    </button>
+                                    <form action="{{ route('kriteria.destroy', $kriteria->id_kriteria) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="ti ti-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Modal for adding/editing kriteria -->

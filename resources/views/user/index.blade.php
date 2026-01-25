@@ -30,56 +30,58 @@
         </button>
 
         <div class="py-6 text-center">
-            <table id="myTableUser" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>NIS</th>
-                        <th>Status</th>
-                        <th>Jenis Kelamin</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($users as $index => $user)
+            <div class="table-responsive">
+                <table id="myTableUser" class="display" style="width:100%">
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $user->nama_user }}</td>
-                            <td>{{ $user->username }}</td>
-                            <td>
-                                <span class="badge {{ $user->role == 'Guru BK' ? 'bg-primary' : 'bg-success' }}">
-                                    {{ $user->role }}
-                                </span>
-                            </td>
-                            <td>{{ $user->nis ?? '-' }}</td>
-                            <td>
-                                @if($user->is_logged_in)
-                                    <span class="badge bg-success">Online</span>
-                                @else
-                                    <span class="badge bg-secondary">Offline</span>
-                                @endif
-                            </td>
-                            <td>{{ $user->jenis_kelamin ?? '-' }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
-                                    <i class="ti ti-edit"></i> Ubah
-                                </button>
-                                <form action="{{ route('user.destroy', $user->id_user) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>NIS</th>
+                            <th>Status</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Aksi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $index => $user)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $user->nama_user }}</td>
+                                <td>{{ $user->username }}</td>
+                                <td>
+                                    <span class="badge {{ $user->role == 'Guru BK' ? 'bg-primary' : 'bg-success' }}">
+                                        {{ $user->role }}
+                                    </span>
+                                </td>
+                                <td>{{ $user->nis ?? '-' }}</td>
+                                <td>
+                                    @if($user->is_logged_in)
+                                        <span class="badge bg-success">Online</span>
+                                    @else
+                                        <span class="badge bg-secondary">Offline</span>
+                                    @endif
+                                </td>
+                                <td>{{ $user->jenis_kelamin ?? '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"
+                                        onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
+                                        <i class="ti ti-edit"></i> Ubah
+                                    </button>
+                                    <form action="{{ route('user.destroy', $user->id_user) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="ti ti-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Modal -->

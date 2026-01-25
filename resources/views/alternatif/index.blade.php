@@ -30,39 +30,41 @@
         </button>
 
         <div class="py-6 text-center">
-            <table id="myTableAlternatif" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Alternatif</th>
-                        <th>Nama Alternatif</th>
-                        <th>Aksi (Ubah/Hapus)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($alternatifs as $index => $alternatif)
+            <div class="table-responsive">
+                <table id="myTableAlternatif" class="display" style="width:100%">
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $alternatif->kode_alternatif }}</td>
-                            <td>{{ $alternatif->nama_alternatif }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="editAlternatif({{ $alternatif->id_alternatif }}, '{{ $alternatif->kode_alternatif }}', '{{ $alternatif->nama_alternatif }}')">
-                                    <i class="ti ti-edit"></i> Ubah
-                                </button>
-                                <form action="{{ route('alternatif.destroy', $alternatif->id_alternatif) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
+                            <th>No</th>
+                            <th>Kode Alternatif</th>
+                            <th>Nama Alternatif</th>
+                            <th>Aksi (Ubah/Hapus)</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($alternatifs as $index => $alternatif)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $alternatif->kode_alternatif }}</td>
+                                <td>{{ $alternatif->nama_alternatif }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"
+                                        onclick="editAlternatif({{ $alternatif->id_alternatif }}, '{{ $alternatif->kode_alternatif }}', '{{ $alternatif->nama_alternatif }}')">
+                                        <i class="ti ti-edit"></i> Ubah
+                                    </button>
+                                    <form action="{{ route('alternatif.destroy', $alternatif->id_alternatif) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="ti ti-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Modal -->
