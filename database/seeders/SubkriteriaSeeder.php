@@ -47,14 +47,8 @@ class SubkriteriaSeeder extends Seeder
             ['id_subkriteria' => 23, 'id_kriteria' => 5, 'nama_subkriteria' => 'Cukup Mendukung', 'nilai' => 3.00],
             ['id_subkriteria' => 24, 'id_kriteria' => 5, 'nama_subkriteria' => 'Mendukung', 'nilai' => 4.00],
             ['id_subkriteria' => 25, 'id_kriteria' => 5, 'nama_subkriteria' => 'Sangat Mendukung', 'nilai' => 5.00],
-
-            // K6 - Tester K (Cost)
-            ['id_subkriteria' => 30, 'id_kriteria' => 22, 'nama_subkriteria' => 'Tidak Baik', 'nilai' => 1.00],
-            ['id_subkriteria' => 31, 'id_kriteria' => 22, 'nama_subkriteria' => 'Kurang Baik', 'nilai' => 2.00],
-            ['id_subkriteria' => 32, 'id_kriteria' => 22, 'nama_subkriteria' => 'Baik', 'nilai' => 3.00],
-            ['id_subkriteria' => 33, 'id_kriteria' => 22, 'nama_subkriteria' => 'Cukup Baik', 'nilai' => 4.00],
-            ['id_subkriteria' => 34, 'id_kriteria' => 22, 'nama_subkriteria' => 'Sangat Baik', 'nilai' => 5.00],
         ];
+
 
         foreach ($subkriterias as $sub) {
             Subkriteria::create($sub);

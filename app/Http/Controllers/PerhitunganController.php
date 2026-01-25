@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Kriteria;
 use App\Models\Alternatif;
+use App\Models\User;
 
 /**
  * Controller untuk halaman Perhitungan SMART.
@@ -21,16 +22,25 @@ class PerhitunganController extends Controller
 {
     /**
      * Tampilkan halaman perhitungan SMART.
-     * 
-     * Logika ini sama persis dengan fungsi legacy:
-     * - getCombinedKriteriaData() untuk normalisasi bobot
-     * - getNilaiUtilityAlternatif() untuk hitung utility
-     * - getNilaiAkhirAlternatif() untuk nilai akhir
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil ID user yang sedang login
-        $userId = Auth::id();
+        $currentUser = Auth::user();
+        $targetUserId = $currentUser->id_user;
+        $users = [];
+
+        // Logika untuk Guru BK: Bisa pilih siswa
+        if ($currentUser->role === 'Guru BK') {
+            $users = User::where('role', 'Siswa')->get();
+
+            // Jika ada request id_user, pakai itu. Jika tidak, pakai siswa pertama.
+            if ($request->has('id_user')) {
+                $targetUserId = $request->id_user;
+            } elseif ($users->count() > 0) {
+                // Default ke siswa pertama jika belum memilih
+                $targetUserId = $users->first()->id_user;
+            }
+        }
 
         // ==============================================
         // STEP 1: Ambil data kriteria & hitung normalisasi bobot
@@ -55,32 +65,32 @@ class PerhitunganController extends Controller
         // ==============================================
         // STEP 3: Cari nilai MIN dan MAX per kriteria
         // Ini dibutuhkan untuk rumus utility
-        // Scope: hanya dari penilaian user yang login
+        // Scope: hanya dari penilaian user yang DIPILIH (targetUserId)
         // ==============================================
-        $minMaxPerKriteria = $this->hitungMinMaxPerKriteria($kriterias, $userId);
+        $minMaxPerKriteria = $this->hitungMinMaxPerKriteria($kriterias, $targetUserId);
 
         // ==============================================
         // STEP 4: Hitung utility dan nilai akhir tiap alternatif
         // ==============================================
-        $hasil = $alternatifs->map(function ($alternatif) use ($userId, $kriterias, $minMaxPerKriteria) {
-            return $this->hitungNilaiAlternatif($alternatif, $userId, $kriterias, $minMaxPerKriteria);
+        $hasil = $alternatifs->map(function ($alternatif) use ($targetUserId, $kriterias, $minMaxPerKriteria) {
+            return $this->hitungNilaiAlternatif($alternatif, $targetUserId, $kriterias, $minMaxPerKriteria);
         });
 
-        // Filter: hanya tampilkan yang sudah ada penilaiannya
+        // Filter: hanya tampilkan yang sudah ada penilaiannya (nilai akhir > 0)
+        // Atau jika kita ingin menampilkan tabel kosong (0 0), hilangkan filter ini?
+        // User komplain "nol nol aja", berarti mereka ingin melihat hasil yang BENAR.
+        // Jika Guru melihat data siswa yang SUDAH menilai, harusnya tidak nol.
+        // Jika filter diaktifkan, dan hasilnya nol, tabel akan hilang (masuk ke @else "Belum ada data").
+        // Jadi kita keep filter ini.
         $hasil = $hasil->filter(function ($alt) {
             return $alt->nilai_akhir > 0;
         });
 
-        return view('perhitungan.index', compact('kriterias', 'hasil'));
+        return view('perhitungan.index', compact('kriterias', 'hasil', 'users', 'targetUserId'));
     }
 
     /**
      * Hitung nilai MIN dan MAX untuk setiap kriteria.
-     * Data diambil dari tabel penilaian (join subkriteria).
-     * 
-     * @param Collection $kriterias - Daftar kriteria
-     * @param int $userId - ID user yang login
-     * @return array - Format: [id_kriteria => ['min' => x, 'max' => y]]
      */
     private function hitungMinMaxPerKriteria($kriterias, $userId)
     {
@@ -114,19 +124,6 @@ class PerhitunganController extends Controller
 
     /**
      * Hitung nilai utility dan nilai akhir untuk satu alternatif.
-     * 
-     * Rumus Utility:
-     * - Benefit: (nilai - min) / (max - min)
-     * - Cost:    (max - nilai) / (max - min)
-     * 
-     * Rumus Nilai Akhir:
-     * - Sum dari (utility * normalisasi bobot) untuk semua kriteria
-     * 
-     * @param Alternatif $alternatif
-     * @param int $userId
-     * @param Collection $kriterias
-     * @param array $minMaxPerKriteria
-     * @return Alternatif - Dengan tambahan property: utilities, nilai_akhir
      */
     private function hitungNilaiAlternatif($alternatif, $userId, $kriterias, $minMaxPerKriteria)
     {
@@ -139,11 +136,13 @@ class PerhitunganController extends Controller
 
         $utilities = [];
         $nilaiAkhir = 0;
+        $nilaiKriteria = []; // Store raw values for display
 
         foreach ($kriterias as $kriteria) {
             // Cari nilai untuk kriteria ini
             $penilaian = $penilaianList->firstWhere('id_kriteria', $kriteria->id_kriteria);
             $nilai = $penilaian ? $penilaian->nilai : 0;
+            $nilaiKriteria[$kriteria->id_kriteria] = $nilai;
 
             // Ambil min dan max untuk kriteria ini
             $min = $minMaxPerKriteria[$kriteria->id_kriteria]['min'];
@@ -151,14 +150,15 @@ class PerhitunganController extends Controller
 
             // Hitung utility
             $utility = $this->hitungUtility($nilai, $min, $max, $kriteria->jenis);
-            $utilities[$kriteria->kode_kriteria] = $utility;
+            $utilities[$kriteria->id_kriteria] = $utility;
 
             // Tambahkan ke nilai akhir: utility * normalisasi
             $nilaiAkhir += ($utility * $kriteria->normalisasi);
         }
 
         // Simpan hasil ke object alternatif
-        $alternatif->utilities = $utilities;
+        $alternatif->nilai_kriteria = $nilaiKriteria;
+        $alternatif->utility = $utilities;
         $alternatif->nilai_akhir = round($nilaiAkhir, 4);
 
         return $alternatif;
@@ -166,18 +166,12 @@ class PerhitunganController extends Controller
 
     /**
      * Hitung nilai utility untuk satu nilai.
-     * 
-     * @param float $nilai - Nilai yang akan dihitung
-     * @param float $min - Nilai minimum dalam dataset
-     * @param float $max - Nilai maksimum dalam dataset
-     * @param string $jenis - 'Benefit' atau 'Cost'
-     * @return float - Nilai utility (0-1)
      */
     private function hitungUtility($nilai, $min, $max, $jenis)
     {
-        // Jika min == max, utility = 1 (semua nilai sama)
+        // Jika min == max, utility = 1 (semua nilai sama), KECUALI jika min/max adalah 0 (belum ada data)
         if ($max == $min) {
-            return 1;
+            return ($max == 0) ? 0 : 1;
         }
 
         // Rumus utility berbeda untuk Benefit dan Cost

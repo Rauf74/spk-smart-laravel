@@ -11,7 +11,103 @@
         <h1 class="mb-4">Hasil Perangkingan</h1>
         <p class="fs-6 mb-4">Rekomendasi program studi berdasarkan hasil perhitungan metode SMART.</p>
 
+        {{-- Stats Calculation --}}
+        @php
+            $totalAlternatif = count($hasil);
+            $nilaiTertinggi = $totalAlternatif > 0 ? max(array_column($hasil, 'nilai_akhir')) : 0;
+            $nilaiTerendah = $totalAlternatif > 0 ? min(array_column($hasil, 'nilai_akhir')) : 0;
+            $rataRata = $totalAlternatif > 0 ? array_sum(array_column($hasil, 'nilai_akhir')) / $totalAlternatif : 0;
+        @endphp
+
+        {{-- Dropdown Pilih Siswa (Hanya untuk Guru BK) --}}
+        @if(Auth::user()->role === 'Guru BK')
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <form action="{{ route('perangkingan.index') }}" method="GET" class="d-flex align-items-center flex-grow-1"
+                        style="max-width: 600px;">
+                        <label for="id_user" class="form-label fw-bold me-3 mb-0 text-nowrap">Target Siswa:</label>
+                        <select name="id_user" id="id_user" class="form-select border-primary" onchange="this.form.submit()">
+                            <option value="">-- Pilih Siswa --</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id_user }}" {{ $userId == $user->id_user ? 'selected' : '' }}>
+                                    {{ $user->nama_user }} ({{ $user->nis }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                    <div>
+                        <a href="{{ request()->fullUrl() }}" class="btn btn-success">
+                            <i class="ti ti-refresh"></i> Refresh Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if(count($hasil) > 0)
+            <!-- Stats Cards Row -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title text-white-50 mb-1">Total Alternatif</h6>
+                                    <h2 class="text-white mb-0">{{ $totalAlternatif }}</h2>
+                                </div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="ti ti-list-numbers fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title text-white-50 mb-1">Nilai Tertinggi</h6>
+                                    <h2 class="text-white mb-0">{{ number_format($nilaiTertinggi, 4) }}</h2>
+                                </div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="ti ti-arrow-up fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title text-white-50 mb-1">Nilai Terendah</h6>
+                                    <h2 class="text-white mb-0">{{ number_format($nilaiTerendah, 4) }}</h2>
+                                </div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="ti ti-arrow-down fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title text-white-50 mb-1">Rata-rata</h6>
+                                    <h2 class="text-white mb-0">{{ number_format($rataRata, 4) }}</h2>
+                                </div>
+                                <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                                    <i class="ti ti-chart-dots fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row mb-4">
                 <!-- Top 3 Cards -->
                 @foreach(array_slice($hasil, 0, 3) as $index => $item)

@@ -17,8 +17,9 @@ Aplikasi ini merupakan migrasi dari project PHP native ke **Laravel Framework**.
 | **PostgreSQL** | 15+ | Database (Supabase) |
 | **Eloquent ORM** | - | Database abstraction |
 | **Blade** | - | Template engine |
-| **Bootstrap** | 5.x | CSS Framework (planned) |
-| **ApexCharts** | - | Dashboard charts (planned) |
+| **Bootstrap** | 5.x | CSS Framework |
+| **ApexCharts** | - | Dashboard charts |
+| **jQuery DataTables** | 2.x | Interactive data tables |
 
 ## 📁 Struktur Folder
 
@@ -151,8 +152,8 @@ Aplikasi akan berjalan di `http://localhost:8000`
 | Seeder | ✅ Selesai | Data contoh dari SQL lama |
 | Views (Blade) | ✅ Selesai | 12 halaman + layout + partials |
 | Assets (CSS/JS) | ✅ Selesai | Bootstrap + ApexCharts + DataTables |
-| Testing | 🔄 In Progress | Perlu testing manual |
-| Deployment | ⏳ Pending | Render + Supabase |
+| Testing | ✅ Selesai | Manual testing completed |
+| Deployment | ✅ Ready | Docker + Render configured |
 
 ## 🔐 Roles & Permissions
 
@@ -198,7 +199,8 @@ GET    /perangkingan       → PerangkinganController@index
 
 **Abdur Rauf Al Farras**
 - GitHub: [@Rauf74](https://github.com/Rauf74)
+- LinkedIn: [Abdur Rauf Al Farras](https://www.linkedin.com/in/abdurrauf74)
 
 ## 📄 License
 
-Project ini dibuat untuk keperluan akademik (Skripsi).
+MIT License - This project was developed as a real-world Decision Support System for SMK Muhammadiyah 3 Tangerang Selatan.

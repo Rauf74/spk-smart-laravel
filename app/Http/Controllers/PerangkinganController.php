@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Kriteria;
 use App\Models\Alternatif;
+use App\Models\User;
 
 /**
  * Controller untuk halaman Perangkingan.
@@ -21,9 +22,24 @@ class PerangkinganController extends Controller
      * 
      * Logic sama dengan PerhitunganController, tapi hasilnya diurutkan descending.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $userId = Auth::id();
+        $currentUser = Auth::user();
+        $userId = $currentUser->id_user;
+        $users = [];
+
+        // Logika untuk Guru BK: Bisa pilih siswa
+        if ($currentUser->role === 'Guru BK') {
+            $users = User::where('role', 'Siswa')->get();
+
+            // Jika ada request id_user, pakai itu. Jika tidak, pakai siswa pertama.
+            if ($request->has('id_user')) {
+                $userId = $request->id_user;
+            } elseif ($users->count() > 0) {
+                // Default ke siswa pertama jika belum memilih
+                $userId = $users->first()->id_user;
+            }
+        }
 
         // ==============================================
         // STEP 1: Ambil kriteria dan hitung normalisasi
@@ -83,7 +99,7 @@ class PerangkinganController extends Controller
                         ? ($nilai - $min) / ($max - $min)
                         : ($max - $nilai) / ($max - $min);
                 } else {
-                    $utility = 1;
+                    $utility = ($max == 0) ? 0 : 1;
                 }
 
                 $nilaiAkhir += ($utility * $k->normalisasi);
@@ -97,10 +113,11 @@ class PerangkinganController extends Controller
         // STEP 5: Filter dan urutkan (RANKING)
         // ==============================================
         $hasil = $hasil
-            ->filter(fn($alt) => $alt->nilai_akhir > 0)  // Hanya yang sudah dinilai
-            ->sortByDesc('nilai_akhir')                   // Urutkan dari tertinggi
-            ->values();                                    // Reset index
+            ->filter(fn($alt) => $alt->nilai_akhir > 0)
+            ->sortByDesc('nilai_akhir')
+            ->values()
+            ->toArray();
 
-        return view('perangkingan.index', compact('kriterias', 'hasil'));
+        return view('perangkingan.index', compact('kriterias', 'hasil', 'users', 'userId'));
     }
 }

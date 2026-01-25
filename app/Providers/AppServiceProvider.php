@@ -19,6 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
+            $event->user->update(['is_logged_in' => true]);
+        });
+
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Logout::class, function ($event) {
+            if ($event->user) {
+                $event->user->update(['is_logged_in' => false]);
+            }
+        });
     }
 }

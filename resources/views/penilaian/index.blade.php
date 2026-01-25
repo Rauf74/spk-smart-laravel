@@ -7,12 +7,7 @@
         <h1 class="mb-4">Data Penilaian</h1>
         <p class="fs-6 mb-4">Daftar alternatif yang dapat dinilai. Pilih alternatif untuk melakukan penilaian.</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         <div class="row">
             @foreach($alternatifs as $alternatif)

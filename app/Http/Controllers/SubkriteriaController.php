@@ -24,9 +24,14 @@ class SubkriteriaController extends Controller
      */
     public function index()
     {
-        // Ambil dengan relasi kriteria untuk menampilkan nama kriteria
-        $subkriterias = Subkriteria::with('kriteria')->get();
-        return view('subkriteria.index', compact('subkriterias'));
+        // Ambil kriteria beserta subkriterianya untuk ditampilkan per grup
+        $kriterias = Kriteria::with([
+            'subkriteria' => function ($q) {
+                $q->orderBy('nilai', 'asc');
+            }
+        ])->get();
+
+        return view('subkriteria.index', compact('kriterias'));
     }
 
     /**

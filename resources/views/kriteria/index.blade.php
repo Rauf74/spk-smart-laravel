@@ -11,12 +11,7 @@
         <h1 class="mb-4">Data Kriteria</h1>
         <p class="fs-6 mb-4">Berisi aspek-aspek penilaian yang menjadi dasar untuk merekomendasikan program studi.</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -64,7 +59,7 @@
                                     <i class="ti ti-edit"></i> Ubah
                                 </button>
                                 <form action="{{ route('kriteria.destroy', $kriteria->id_kriteria) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kriteria ini?')">
+                                    class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">

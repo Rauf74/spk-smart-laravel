@@ -22,9 +22,11 @@ class PertanyaanController extends Controller
      */
     public function index()
     {
-        // Ambil dengan relasi untuk menampilkan nama kriteria dan alternatif
-        $pertanyaans = Pertanyaan::with(['kriteria', 'alternatif'])->get();
-        return view('pertanyaan.index', compact('pertanyaans'));
+        // Ambil alternatif beserta pertanyaan untuk ditampilkan per grup
+        $alternatifs = Alternatif::with(['pertanyaan.kriteria'])->get();
+        $kriterias = Kriteria::all();
+
+        return view('pertanyaan.index', compact('alternatifs', 'kriterias'));
     }
 
     /**

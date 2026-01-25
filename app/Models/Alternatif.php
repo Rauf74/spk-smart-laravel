@@ -17,4 +17,9 @@ class Alternatif extends Model
         'kode_alternatif',
         'nama_alternatif',
     ];
+
+    public function pertanyaan()
+    {
+        return $this->hasMany(Pertanyaan::class, 'id_alternatif', 'id_alternatif');
+    }
 }

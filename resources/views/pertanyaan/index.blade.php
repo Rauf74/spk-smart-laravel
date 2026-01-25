@@ -11,12 +11,7 @@
         <h1 class="mb-4">Data Pertanyaan</h1>
         <p class="fs-6 mb-4">Berisi pertanyaan yang akan diajukan kepada siswa untuk setiap kriteria dan alternatif.</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -29,47 +24,62 @@
             </div>
         @endif
 
-        <button type="button" class="btn btn-primary m-1 mt-3" data-bs-toggle="modal" data-bs-target="#pertanyaanModal"
-            onclick="resetForm()">
-            Tambah Pertanyaan
-        </button>
-
-        <div class="py-6 text-center">
-            <table id="myTablePertanyaan" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kriteria</th>
-                        <th>Alternatif</th>
-                        <th>Teks Pertanyaan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($pertanyaans as $index => $pertanyaan)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $pertanyaan->kriteria->nama_kriteria ?? '-' }}</td>
-                            <td>{{ $pertanyaan->alternatif->nama_alternatif ?? '-' }}</td>
-                            <td>{{ Str::limit($pertanyaan->teks_pertanyaan, 50) }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="editPertanyaan({{ $pertanyaan->id_pertanyaan }}, {{ $pertanyaan->id_kriteria }}, {{ $pertanyaan->id_alternatif }}, `{{ addslashes($pertanyaan->teks_pertanyaan) }}`)">
-                                    <i class="ti ti-edit"></i> Ubah
-                                </button>
-                                <form action="{{ route('pertanyaan.destroy', $pertanyaan->id_pertanyaan) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus pertanyaan ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <!-- Dynamic Tables Container -->
+        <div class="py-4">
+            @foreach($alternatifs as $alternatif)
+                <div class="card mb-4 shadow-sm border">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">Prodi: {{ $alternatif->nama_alternatif }}</h5>
+                        <button type="button" class="btn btn-primary btn-sm"
+                            onclick="openAddModal({{ $alternatif->id_alternatif }})">
+                            <i class="ti ti-plus"></i> Tambah Pertanyaan
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle display datatable-pert"
+                                style="width:100%">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kriteria</th>
+                                        <th>Teks Pertanyaan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($alternatif->pertanyaan as $index => $pertanyaan)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $pertanyaan->kriteria->nama_kriteria ?? '-' }}</td>
+                                            <td>{{ $pertanyaan->teks_pertanyaan }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-warning me-1"
+                                                    onclick="editPertanyaan({{ $pertanyaan->id_pertanyaan }}, {{ $pertanyaan->id_kriteria }}, {{ $alternatif->id_alternatif }}, `{{ addslashes($pertanyaan->teks_pertanyaan) }}`)">
+                                                    Edit
+                                                </button>
+                                                <form action="{{ route('pertanyaan.destroy', $pertanyaan->id_pertanyaan) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    @if($alternatif->pertanyaan->isEmpty())
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Belum ada pertanyaan</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         <!-- Modal -->
@@ -85,6 +95,10 @@
                             @csrf
                             <input type="hidden" id="formMethod" name="_method" value="POST">
 
+                            {{-- Hidden Alternatif ID (set via JS) OR Dropdown DISABLED --}}
+                            {{-- PHP version sets it hidden. We can hide it or show read-only. --}}
+                            <input type="hidden" id="id_alternatif" name="id_alternatif">
+
                             <div class="mb-3">
                                 <label for="id_kriteria" class="form-label">Kriteria</label>
                                 <select class="form-select" id="id_kriteria" name="id_kriteria" required>
@@ -96,20 +110,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="id_alternatif" class="form-label">Alternatif</label>
-                                <select class="form-select" id="id_alternatif" name="id_alternatif" required>
-                                    <option value="">Pilih Alternatif</option>
-                                    @foreach($alternatifs as $alternatif)
-                                        <option value="{{ $alternatif->id_alternatif }}">{{ $alternatif->nama_alternatif }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
                                 <label for="teks_pertanyaan" class="form-label">Teks Pertanyaan</label>
-                                <textarea class="form-control" id="teks_pertanyaan" name="teks_pertanyaan" rows="4"
-                                    required></textarea>
+                                <textarea class="form-control" id="teks_pertanyaan" name="teks_pertanyaan" rows="4" required
+                                    placeholder="Contoh: Apakah Anda menyukai mata pelajaran Matematika?"></textarea>
                             </div>
 
                             <div class="modal-footer">
@@ -132,8 +135,26 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
         $(document).ready(function () {
-            $('#myTablePertanyaan').DataTable();
+            $('.datatable-pert').each(function () {
+                if ($(this).find('tbody tr td').length > 1) {
+                    $(this).DataTable({
+                        paging: false,
+                        searching: false,
+                        info: false
+                    });
+                }
+            });
         });
+
+        var pertanyaanModal = new bootstrap.Modal(document.getElementById('pertanyaanModal'));
+
+        function openAddModal(idAlternatif) {
+            resetForm();
+            if (idAlternatif) {
+                document.getElementById('id_alternatif').value = idAlternatif;
+            }
+            pertanyaanModal.show();
+        }
 
         function resetForm() {
             document.getElementById('modalTitle').innerText = 'Tambah Pertanyaan';
@@ -145,6 +166,7 @@
         }
 
         function editPertanyaan(id, idKriteria, idAlternatif, teks) {
+            resetForm();
             document.getElementById('modalTitle').innerText = 'Ubah Pertanyaan';
             document.getElementById('pertanyaanForm').action = '/pertanyaan/' + id;
             document.getElementById('formMethod').value = 'PUT';
@@ -152,8 +174,7 @@
             document.getElementById('id_alternatif').value = idAlternatif;
             document.getElementById('teks_pertanyaan').value = teks;
 
-            var modal = new bootstrap.Modal(document.getElementById('pertanyaanModal'));
-            modal.show();
+            pertanyaanModal.show();
         }
     </script>
 @endpush

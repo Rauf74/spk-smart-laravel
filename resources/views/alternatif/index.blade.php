@@ -11,12 +11,7 @@
         <h1 class="mb-4">Data Alternatif</h1>
         <p class="fs-6 mb-4">Berisi daftar program studi yang akan direkomendasikan kepada siswa.</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -56,7 +51,7 @@
                                     <i class="ti ti-edit"></i> Ubah
                                 </button>
                                 <form action="{{ route('alternatif.destroy', $alternatif->id_alternatif) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus alternatif ini?')">
+                                    class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">

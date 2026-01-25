@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
     // Master Data
     Route::resource('kriteria', KriteriaController::class);
@@ -36,7 +37,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('user', UserController::class);
 
     // SPK Logic
-    Route::resource('penilaian', PenilaianController::class)->only(['index', 'create', 'store', 'edit']);
+    Route::get('penilaian/create/{id_alternatif}', [PenilaianController::class, 'create'])->name('penilaian.create');
+    Route::delete('penilaian/destroyPerAlternatif', [PenilaianController::class, 'destroyPerAlternatif'])->name('penilaian.destroyPerAlternatif');
+    Route::resource('penilaian', PenilaianController::class)->only(['index', 'store', 'edit']);
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
 });

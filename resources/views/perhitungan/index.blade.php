@@ -11,6 +11,28 @@
         <h1 class="mb-4">Data Perhitungan</h1>
         <p class="fs-6 mb-4">Hasil perhitungan menggunakan metode SMART (Simple Multi-Attribute Rating Technique).</p>
 
+        {{-- Dropdown Pilih Siswa (Hanya untuk Guru BK) --}}
+        @if(Auth::user()->role === 'Guru BK')
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ route('perhitungan.index') }}" method="GET" class="row align-items-center">
+                        <div class="col-auto">
+                            <label for="id_user" class="col-form-label fw-bold">Pilih Siswa:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select name="id_user" id="id_user" class="form-select" onchange="this.form.submit()">
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id_user }}" {{ $targetUserId == $user->id_user ? 'selected' : '' }}>
+                                        {{ $user->nama_user }} ({{ $user->nis }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
+
         @if(count($hasil) > 0)
             <!-- Tabel Bobot Normalisasi -->
             <div class="card mb-4">
@@ -72,7 +94,7 @@
                 </div>
             </div>
 
-            <!-- Tabel Utility per Kriteria -->
+            <!-- Tabel Nilai Utility per Kriteria -->
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Nilai Utility per Kriteria</h5>

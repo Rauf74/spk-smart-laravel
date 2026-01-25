@@ -11,12 +11,7 @@
         <h1 class="mb-4">Data User</h1>
         <p class="fs-6 mb-4">Berisi daftar pengguna sistem (Guru BK dan Siswa).</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -43,6 +38,7 @@
                         <th>Username</th>
                         <th>Role</th>
                         <th>NIS</th>
+                        <th>Status</th>
                         <th>Jenis Kelamin</th>
                         <th>Aksi</th>
                     </tr>
@@ -59,14 +55,20 @@
                                 </span>
                             </td>
                             <td>{{ $user->nis ?? '-' }}</td>
+                            <td>
+                                @if($user->is_logged_in)
+                                    <span class="badge bg-success">Online</span>
+                                @else
+                                    <span class="badge bg-secondary">Offline</span>
+                                @endif
+                            </td>
                             <td>{{ $user->jenis_kelamin ?? '-' }}</td>
                             <td>
                                 <button class="btn btn-sm btn-warning"
                                     onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
                                     <i class="ti ti-edit"></i> Ubah
                                 </button>
-                                <form action="{{ route('user.destroy', $user->id_user) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                                <form action="{{ route('user.destroy', $user->id_user) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">

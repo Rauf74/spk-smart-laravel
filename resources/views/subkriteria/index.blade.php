@@ -9,14 +9,10 @@
 @section('content')
     <div class="container-fluid">
         <h1 class="mb-4">Data Subkriteria</h1>
-        <p class="fs-6 mb-4">Berisi pilihan nilai untuk setiap kriteria penilaian.</p>
+        <p class="fs-6 mb-4">Merinci setiap kriteria menjadi poin-poin terukur menggunakan skala 1-5 untuk penilaian yang
+            lebih detail.</p>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -29,47 +25,62 @@
             </div>
         @endif
 
-        <button type="button" class="btn btn-primary m-1 mt-3" data-bs-toggle="modal" data-bs-target="#subkriteriaModal"
-            onclick="resetForm()">
-            Tambah Subkriteria
-        </button>
-
-        <div class="py-6 text-center">
-            <table id="myTableSubkriteria" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kriteria</th>
-                        <th>Nama Subkriteria</th>
-                        <th>Nilai</th>
-                        <th>Aksi (Ubah/Hapus)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($subkriterias as $index => $subkriteria)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $subkriteria->kriteria->nama_kriteria ?? '-' }}</td>
-                            <td>{{ $subkriteria->nama_subkriteria }}</td>
-                            <td>{{ $subkriteria->nilai }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="editSubkriteria({{ $subkriteria->id_subkriteria }}, {{ $subkriteria->id_kriteria }}, '{{ $subkriteria->nama_subkriteria }}', '{{ $subkriteria->nilai }}')">
-                                    <i class="ti ti-edit"></i> Ubah
-                                </button>
-                                <form action="{{ route('subkriteria.destroy', $subkriteria->id_subkriteria) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus subkriteria ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <!-- Dynamic Tables Container -->
+        <div class="py-4">
+            @foreach($kriterias as $kriteria)
+                <div class="card mb-4 shadow-sm border">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">Kriteria: {{ $kriteria->nama_kriteria }}</h5>
+                        <button type="button" class="btn btn-primary btn-sm"
+                            onclick="openAddModal({{ $kriteria->id_kriteria }})">
+                            <i class="ti ti-plus"></i> Tambah Subkriteria
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle display datatable-sub"
+                                style="width:100%">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Subkriteria</th>
+                                        <th>Nilai</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($kriteria->subkriteria as $index => $sub)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $sub->nama_subkriteria }}</td>
+                                            <td>{{ $sub->nilai }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-warning me-1"
+                                                    onclick="editSubkriteria({{ $sub->id_subkriteria }}, {{ $sub->id_kriteria }}, '{{ $sub->nama_subkriteria }}', '{{ $sub->nilai }}')">
+                                                    Edit
+                                                </button>
+                                                <form action="{{ route('subkriteria.destroy', $sub->id_subkriteria) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    @if($kriteria->subkriteria->isEmpty())
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Belum ada data subkriteria</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         <!-- Modal -->
@@ -98,13 +109,13 @@
                             <div class="mb-3">
                                 <label for="nama_subkriteria" class="form-label">Nama Subkriteria</label>
                                 <input type="text" class="form-control" id="nama_subkriteria" name="nama_subkriteria"
-                                    placeholder="contoh: Sangat Baik, Baik, Cukup" required>
+                                    placeholder="contoh: Sangat Baik" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="nilai" class="form-label">Nilai</label>
-                                <input type="text" class="form-control" id="nilai" name="nilai" required
-                                    pattern="[0-9]+([.][0-9]{1,2})?" placeholder="contoh: 1, 2, 3, 4, 5">
+                                <input type="number" step="0.01" class="form-control" id="nilai" name="nilai" required
+                                    placeholder="contoh: 5">
                             </div>
 
                             <div class="modal-footer">
@@ -127,8 +138,29 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
         $(document).ready(function () {
-            $('#myTableSubkriteria').DataTable();
+            // Inisialisasi DataTable untuk setiap tabel subkriteria yg memiliki rows
+            $('.datatable-sub').each(function () {
+                // Hanya init jika ada data row (selain empty placeholder)
+                if ($(this).find('tbody tr td').length > 1) {
+                    $(this).DataTable({
+                        paging: false,
+                        searching: false, // Matikan pencarian per tabel kecil
+                        info: false
+                    });
+                }
+            });
         });
+
+        // Initialize Modal
+        var subkriteriaModal = new bootstrap.Modal(document.getElementById('subkriteriaModal'));
+
+        function openAddModal(idKriteria) {
+            resetForm();
+            if (idKriteria) {
+                document.getElementById('id_kriteria').value = idKriteria;
+            }
+            subkriteriaModal.show();
+        }
 
         function resetForm() {
             document.getElementById('modalTitle').innerText = 'Tambah Subkriteria';
@@ -140,6 +172,7 @@
         }
 
         function editSubkriteria(id, idKriteria, nama, nilai) {
+            resetForm();
             document.getElementById('modalTitle').innerText = 'Ubah Subkriteria';
             document.getElementById('subkriteriaForm').action = '/subkriteria/' + id;
             document.getElementById('formMethod').value = 'PUT';
@@ -147,8 +180,7 @@
             document.getElementById('nama_subkriteria').value = nama;
             document.getElementById('nilai').value = nilai;
 
-            var modal = new bootstrap.Modal(document.getElementById('subkriteriaModal'));
-            modal.show();
+            subkriteriaModal.show();
         }
     </script>
 @endpush
