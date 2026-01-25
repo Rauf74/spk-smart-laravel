@@ -58,6 +58,9 @@
 
             $(".sidebartoggler").on("click", function () {
                 $("#main-wrapper").toggleClass("mini-sidebar");
+                if (window.innerWidth < 1199) {
+                    $("#main-wrapper").toggleClass("show-sidebar");
+                }
             });
 
             // Flash Messages via SweetAlert2

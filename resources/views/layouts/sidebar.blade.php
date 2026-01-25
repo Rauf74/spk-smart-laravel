@@ -8,9 +8,7 @@
                     <span class="d-block fs-4 fw-bold">Tangerang Selatan</span>
                 </div>
             </a>
-            <div class="d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarToggler">
-                <i class="ti ti-x fs-8"></i>
-            </div>
+            </a>
         </div>
         <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
