@@ -4,9 +4,17 @@ Aplikasi Sistem Pendukung Keputusan (SPK) menggunakan metode **SMART (Simple Mul
 
 ## 📋 Deskripsi
 
-Aplikasi ini merupakan migrasi dari project PHP native ke **Laravel Framework**. Digunakan oleh:
-- **Guru BK**: Mengelola data kriteria, alternatif (program studi), pertanyaan, dan melihat hasil penilaian siswa
-- **Siswa**: Mengisi penilaian dan melihat rekomendasi program studi
+Aplikasi ini merupakan migrasi modern dari project PHP native ke **Laravel Framework 12.x**. Dilengkapi dengan antarmuka yang bersih, responsif, dan interaktif. Digunakan oleh:
+- **Guru BK**: Mengelola data kriteria, alternatif (program studi), pertanyaan, memantau aktivitas siswa (Status Online), dan melihat hasil rekomendasi.
+- **Siswa**: Mengisi kuesioner penilaian dan melihat rekomendasi program studi terbaik berdasarkan perhitungan sistem.
+
+## ✨ Fitur Utama (New)
+
+- **Modern Dashboard**: Statistik real-time dengan grafik visual (ApexCharts) dan kartu indikator kinerja.
+- **Status Online**: Deteksi otomatis status pengguna (Online/Offline) menggunakan Event Listeners.
+- **SweetAlert2**: Notifikasi interaktif untuk feedback aksi (Simpan, Update, Hapus, Error) menggantikan alert standar.
+- **Enhanced SMART Logic**: Algoritma perhitungan yang lebih akurat, menangani kasus data kosong (default Utility 0).
+- **Interactive Tables**: DataTables untuk pencarian, pengurutan, dan paging data yang cepat.
 
 ## 🚀 Tech Stack
 
@@ -17,7 +25,8 @@ Aplikasi ini merupakan migrasi dari project PHP native ke **Laravel Framework**.
 | **PostgreSQL** | 15+ | Database (Supabase) |
 | **Eloquent ORM** | - | Database abstraction |
 | **Blade** | - | Template engine |
-| **Bootstrap** | 5.x | CSS Framework |
+| **Bootstrap** | 5.3 | CSS Framework (SB Admin 2 variant) |
+| **SweetAlert2** | 11.x | Interactive Popups |
 | **ApexCharts** | - | Dashboard charts |
 | **jQuery DataTables** | 2.x | Interactive data tables |
 
@@ -28,24 +37,13 @@ spk-smart-laravel/
 ├── app/
 │   ├── Http/
 │   │   └── Controllers/          # Logic aplikasi
-│   │       ├── Auth/
-│   │       │   └── LoginController.php
+│   │       ├── Auth/             # Autentikasi
 │   │       ├── AlternatifController.php
 │   │       ├── DashboardController.php
-│   │       ├── KriteriaController.php
-│   │       ├── PenilaianController.php
-│   │       ├── PerangkinganController.php
 │   │       ├── PerhitunganController.php   # Logic SMART
-│   │       ├── PertanyaanController.php
-│   │       ├── SubkriteriaController.php
-│   │       └── UserController.php
+│   │       └── ...
+│   ├── Listeners/                # Event Listeners (Login/Logout)
 │   └── Models/                   # Representasi tabel database
-│       ├── Alternatif.php
-│       ├── Kriteria.php
-│       ├── Penilaian.php
-│       ├── Pertanyaan.php
-│       ├── Subkriteria.php
-│       └── User.php
 ├── database/
 │   └── migrations/               # Blueprint tabel database
 ├── resources/
@@ -65,6 +63,7 @@ users ──────────────────────┐
   password                  │
   role (Guru BK/Siswa)      │
   nis                       │
+  is_logged_in (boolean)    │ <─ New: Status Online
                             │
 kriteria ───────────────────┼─── subkriteria
   id_kriteria (PK)          │      id_subkriteria (PK)
@@ -97,6 +96,7 @@ Metode SMART menghitung rekomendasi dengan langkah:
 2. **Hitung Utility**:
    - Benefit: `(nilai - min) / (max - min)`
    - Cost: `(max - nilai) / (max - min)`
+   - *Logic Fix*: Jika `min == max == 0` (data kosong), Utility = 0.
 3. **Nilai Akhir**: `Σ (utility × normalisasi)`
 4. **Ranking**: Urutkan dari nilai akhir tertinggi
 
@@ -123,11 +123,7 @@ php artisan key:generate
 
 # 4. Konfigurasi database di .env
 # DB_CONNECTION=pgsql
-# DB_HOST=your-supabase-host
-# DB_PORT=5432
-# DB_DATABASE=postgres
-# DB_USERNAME=postgres
-# DB_PASSWORD=your-password
+# ...
 
 # 5. Jalankan migrasi
 php artisan migrate
@@ -141,59 +137,26 @@ php artisan serve
 
 Aplikasi akan berjalan di `http://localhost:8000`
 
-## 📊 Progress Development
+## 📊 Status Development
 
-| Fase | Status | Catatan |
-|------|--------|---------|
-| Database Schema | ✅ Selesai | 6 tabel dengan relasi |
-| Eloquent Models | ✅ Selesai | 6 model dengan relationships |
-| Controllers | ✅ Selesai | 10 controller (CRUD + SMART logic) |
-| Routes | ✅ Selesai | RESTful routes |
-| Seeder | ✅ Selesai | Data contoh dari SQL lama |
-| Views (Blade) | ✅ Selesai | 12 halaman + layout + partials |
-| Assets (CSS/JS) | ✅ Selesai | Bootstrap + ApexCharts + DataTables |
-| Testing | ✅ Selesai | Manual testing completed |
-| Deployment | ✅ Ready | Docker + Render configured |
+| Modul | Status | Keterangan |
+|-------|--------|------------|
+| **Core System** | ✅ Selesai | Auth, Database, Routing |
+| **Master Data** | ✅ Selesai | CRUD Kriteria, Sub, Alternatif, User |
+| **Logic SMART** | ✅ Selesai | Perhitungan akurat + Edge cases handled |
+| **UI/UX** | ✅ Polished | Bootstrap 5, SweetAlert2, Responsive |
+| **Features** | ✅ Selesai | Dashboard Stats, Online Status, Reporting |
 
 ## 🔐 Roles & Permissions
 
 | Fitur | Guru BK | Siswa |
 |-------|:-------:|:-----:|
-| Dashboard | ✅ | ✅ |
-| Kelola Kriteria | ✅ | ❌ |
-| Kelola Subkriteria | ✅ | ❌ |
-| Kelola Alternatif | ✅ | ❌ |
-| Kelola Pertanyaan | ✅ | ❌ |
-| Kelola User | ✅ | ❌ |
+| Dashboard Metrics | ✅ | ✅ |
+| Kelola Master Data | ✅ | ❌ |
+| Monitoring User | ✅ | ❌ |
 | Isi Penilaian | ❌ | ✅ |
-| Lihat Perhitungan | ✅ | ✅ |
-| Lihat Perangkingan | ✅ | ✅ |
-
-## 📝 API Routes
-
-```
-GET    /login              → LoginController@showLoginForm
-POST   /login              → LoginController@login
-POST   /logout             → LoginController@logout
-
-GET    /                   → DashboardController@index
-
-# Master Data (CRUD)
-GET    /kriteria           → KriteriaController@index
-POST   /kriteria           → KriteriaController@store
-GET    /kriteria/{id}/edit → KriteriaController@edit
-PUT    /kriteria/{id}      → KriteriaController@update
-DELETE /kriteria/{id}      → KriteriaController@destroy
-
-# (sama untuk subkriteria, alternatif, pertanyaan, user)
-
-# SPK
-GET    /penilaian          → PenilaianController@index
-GET    /penilaian/create/{id} → PenilaianController@create
-POST   /penilaian          → PenilaianController@store
-GET    /perhitungan        → PerhitunganController@index
-GET    /perangkingan       → PerangkinganController@index
-```
+| Lihat Detail Hitung | ✅ | ✅ |
+| Lihat Ranking | ✅ (All) | ✅ (Personal) |
 
 ## 👤 Author
 
