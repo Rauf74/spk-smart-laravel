@@ -25,7 +25,7 @@ Aplikasi ini merupakan migrasi modern dari project PHP native ke **Laravel Frame
 | **PostgreSQL** | 15+ | Database (Supabase) |
 | **Eloquent ORM** | - | Database abstraction |
 | **Blade** | - | Template engine |
-| **Bootstrap** | 5.3 | CSS Framework (SB Admin 2 variant) |
+| **Bootstrap** | 5.3 | CSS Framework (Template: Modernize) |
 | **SweetAlert2** | 11.x | Interactive Popups |
 | **ApexCharts** | - | Dashboard charts |
 | **jQuery DataTables** | 2.x | Interactive data tables |
