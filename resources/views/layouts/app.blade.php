@@ -63,6 +63,22 @@
                 }
             });
 
+            // Close Sidebar when clicking outside (Mobile)
+            $(document).on('click', function (e) {
+                var sidebar = $("aside.left-sidebar");
+                var toggler = $(".sidebartoggler");
+
+                // Cek jika sidebar sedang terbuka
+                if ($("#main-wrapper").hasClass("show-sidebar")) {
+                    // Jika yang diklik BUKAN sidebar DAN BUKAN tombol toggle
+                    if (!sidebar.is(e.target) && sidebar.has(e.target).length === 0 &&
+                        !toggler.is(e.target) && toggler.has(e.target).length === 0) {
+
+                        $("#main-wrapper").removeClass("show-sidebar");
+                    }
+                }
+            });
+
             // Flash Messages via SweetAlert2
             @if(session('success'))
                 Swal.fire({
