@@ -37,17 +37,39 @@ spk-smart-laravel/
 ├── app/
 │   ├── Http/
 │   │   └── Controllers/          # Logic aplikasi
-│   │       ├── Auth/             # Autentikasi
+│   │       ├── Auth/
+│   │       │   └── LoginController.php
 │   │       ├── AlternatifController.php
 │   │       ├── DashboardController.php
+│   │       ├── KriteriaController.php
+│   │       ├── PenilaianController.php
+│   │       ├── PerangkinganController.php
 │   │       ├── PerhitunganController.php   # Logic SMART
-│   │       └── ...
-│   ├── Listeners/                # Event Listeners (Login/Logout)
+│   │       ├── PertanyaanController.php
+│   │       ├── ProfileController.php       # Profile & Password
+│   │       ├── SubkriteriaController.php
+│   │       └── UserController.php
 │   └── Models/                   # Representasi tabel database
+│       ├── Alternatif.php
+│       ├── Kriteria.php
+│       ├── Penilaian.php
+│       ├── Pertanyaan.php
+│       ├── Subkriteria.php
+│       └── User.php
 ├── database/
-│   └── migrations/               # Blueprint tabel database
+│   ├── migrations/               # Blueprint tabel database
+│   └── seeders/                  # Dummy Data
+│       ├── AlternatifSeeder.php
+│       ├── DatabaseSeeder.php
+│       ├── UserSeeder.php
+│       └── ...
 ├── resources/
 │   └── views/                    # Template HTML (Blade)
+│       ├── auth/                 # Login views
+│       ├── layouts/              # Header, Sidebar, Footer
+│       ├── penilaian/            # Form & List Penilaian
+│       ├── perangkingan/         # Hasil SMART
+│       └── ... (Modules)
 ├── routes/
 │   └── web.php                   # Definisi URL routes
 └── .env                          # Konfigurasi environment
