@@ -37,14 +37,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
 
     // Master Data (ADMIN ONLY - Guru BK)
-    Route::middleware([
-        function ($request, $next) {
-            if (\Illuminate\Support\Facades\Auth::user()->role !== 'Guru BK') {
-                abort(403, 'Akses Ditolak. Halaman ini hanya untuk Guru BK.');
-            }
-            return $next($request);
-        }
-    ])->group(function () {
+    // Master Data (ADMIN ONLY - Guru BK)
+    Route::middleware(['can:access-master-data'])->group(function () {
         Route::resource('kriteria', KriteriaController::class);
         Route::resource('subkriteria', SubkriteriaController::class);
         Route::resource('alternatif', AlternatifController::class);

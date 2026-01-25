@@ -28,5 +28,10 @@ class AppServiceProvider extends ServiceProvider
                 $event->user->update(['is_logged_in' => false]);
             }
         });
+
+        // Gate: Hanya Guru BK yang bisa akses Master Data
+        \Illuminate\Support\Facades\Gate::define('access-master-data', function ($user) {
+            return $user->role === 'Guru BK';
+        });
     }
 }
