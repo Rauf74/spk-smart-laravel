@@ -191,6 +191,81 @@
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Check for Registration Success Flash
+            @if(session('register_success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: '<i class="bi bi-check-circle-fill text-success"></i><br>Pendaftaran Berhasil!',
+                    html: `
+                            <div class="alert alert-success mt-3">
+                                <i class="bi bi-shield-check me-2"></i>
+                                Akun siswa berhasil didaftarkan dalam sistem SPK.
+                            </div>
+                            <p class="mb-3">Selamat datang, <strong>{{ session('register_success') }}</strong>!</p>
+                            <p class="text-muted">Silakan login dengan akun yang baru dibuat.</p>
+                        `,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'rounded-4'
+                    },
+                    didOpen: function () {
+                        // Confetti animation
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    }
+                });
+            @endif
+
+            // Enhanced form submission
+            $('form').on('submit', function (e) {
+                if (this.checkValidity()) {
+                    e.preventDefault();
+
+                    // Show enhanced loading from spk-smart-php
+                    Swal.fire({
+                        title: '<div class="spinner-border text-primary mb-3" role="status"></div>',
+                        html: `
+                            <h5 class="mb-3">Memverifikasi Login</h5>
+                            <div class="progress mb-3">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <p class="text-muted mb-0">Sedang memeriksa kredensial...</p>
+                        `,
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'rounded-4'
+                        },
+                        didOpen: function () {
+                            // Simulate progress
+                            let progress = 0;
+                            const progressBar = document.querySelector('.progress-bar');
+                            const interval = setInterval(() => {
+                                progress += 5; // Slower increment because page reload takes time
+                                if (progress <= 90) {
+                                    progressBar.style.width = progress + '%';
+                                } else {
+                                    clearInterval(interval);
+                                }
+                            }, 100);
+                        }
+                    });
+
+                    this.submit();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

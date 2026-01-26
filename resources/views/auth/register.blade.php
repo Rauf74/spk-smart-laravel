@@ -7,6 +7,7 @@
     <title>Registrasi - SPK Rekomendasi Program Studi</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/smk3.png') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
@@ -102,6 +103,91 @@
 
     <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Enhanced form submission
+            $('form').on('submit', function (e) {
+                var form = this;
+                
+                if (form.checkValidity()) { 
+                    e.preventDefault();
+
+                    // Get form data for confirmation
+                    var nama_user = $('#nama_user').val();
+                    var username = $('#username').val();
+                    var jenis_kelamin = $('#jenis_kelamin').val();
+                    var nis = $('#nis').val() || '-';
+
+                    // Enhanced confirmation dialog from spk-smart-php
+                    Swal.fire({
+                        title: '<i class="bi bi-person-check text-primary"></i><br>Konfirmasi Pendaftaran',
+                        html: `
+                            <div class="text-start mt-3">
+                                <p class="mb-2"><strong>Nama:</strong> ${nama_user}</p>
+                                <p class="mb-2"><strong>Username:</strong> ${username}</p>
+                                <p class="mb-2"><strong>Jenis Kelamin:</strong> ${jenis_kelamin}</p>
+                                <p class="mb-2"><strong>NIS:</strong> ${nis}</p>
+                            </div>
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Pastikan data yang Anda masukkan sudah benar.
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#667eea',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="bi bi-check-circle me-1"></i>Ya, Daftar Sekarang!',
+                        cancelButtonText: '<i class="bi bi-x-circle me-1"></i>Periksa Kembali',
+                        customClass: {
+                            popup: 'rounded-4',
+                            confirmButton: 'rounded-3',
+                            cancelButton: 'rounded-3'
+                        }
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            // Show loading with modern design
+                            Swal.fire({
+                                title: '<div class="spinner-border text-primary mb-3" role="status"></div>',
+                                html: `
+                                    <h5 class="mb-3">Sedang Memproses Pendaftaran</h5>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                             role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-muted mb-0">Mohon tunggu sebentar...</p>
+                                `,
+                                allowOutsideClick: false,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-4'
+                                },
+                                didOpen: function () {
+                                    // Animate progress bar
+                                    let progress = 0;
+                                    const progressBar = document.querySelector('.progress-bar');
+                                    const interval = setInterval(() => {
+                                        progress += 10;
+                                        if (progress <= 90) {
+                                            progressBar.style.width = progress + '%';
+                                        } else {
+                                            clearInterval(interval);
+                                        }
+                                    }, 100);
+                                }
+                            });
+                            
+                            form.submit();
+                        }
+                    });
+                } else {
+                    // Let HTML5 validation show errors
+                    form.reportValidity();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

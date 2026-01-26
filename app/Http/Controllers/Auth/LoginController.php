@@ -49,7 +49,7 @@ class LoginController extends Controller
             $user = Auth::user();
             $user->is_logged_in = true;
             $user->save();
-            return redirect()->intended('/');
+            return redirect()->intended('/')->with('login_success', true);
         }
 
         return back()
@@ -80,11 +80,8 @@ class LoginController extends Controller
             'is_logged_in' => false,
         ]);
 
-        Auth::login($user);
-        $user->is_logged_in = true;
-        $user->save();
-
-        return redirect('/');
+        // Legacy behavior: Redirect to login after register (No Auto Login)
+        return redirect('/login')->with('register_success', $user->nama_user);
     }
 
     /**

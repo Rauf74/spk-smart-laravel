@@ -47,7 +47,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script>
+        @if(session('login_success'))
+            Swal.fire({
+                icon: 'success',
+                title: '<i class="bi bi-check-circle-fill text-success animate-check"></i><br>Login Berhasil!',
+                html: `
+                        <div class="alert alert-success mt-3 text-center">
+                            Selamat datang kembali, <strong>{{ Auth::user()->nama_user }}</strong>!
+                        </div>
+                        <div class="bg-light rounded-3 p-3 mt-3 text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-person-badge me-2 text-primary"></i>
+                                <span class="fw-semibold">Role: {{ Auth::user()->role }}</span>
+                            </div>
+                        </div>
+                    `,
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'rounded-4'
+                },
+                didOpen: function () {
+                    // Animasi ceklis (Legacy Style)
+                    const checkIcon = document.querySelector('.animate-check');
+                    if (checkIcon) {
+                        checkIcon.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                        checkIcon.style.transform = 'scale(1.2)';
+                        checkIcon.style.opacity = '0.8';
+                        setTimeout(() => {
+                            checkIcon.style.transform = 'scale(1)';
+                            checkIcon.style.opacity = '1';
+                        }, 500);
+                    }
+                }
+            });
+        @endif
+    </script>
     <!-- Custom Sidebar Logic -->
     <script>
         $(function () {
