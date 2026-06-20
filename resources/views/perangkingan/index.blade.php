@@ -84,19 +84,19 @@
                                 <i class="ti ti-trophy"></i>
                                 <span class="fw-semibold">Rekomendasi Utama</span>
                             </div>
-                            <h2 class="fw-bold mb-2">{{ $topAlternatif['nama_alternatif'] }}</h2>
-                            <p class="mb-3 opacity-75">
+                            <h2 class="fw-bold mb-2 text-white">{{ $topAlternatif['nama_alternatif'] }}</h2>
+                            <p class="mb-3 opacity-75 text-white">
                                 Program studi ini paling sesuai berdasarkan penilaian kamu saat ini.
                             </p>
 
                             @if(count($insightKriterias) > 0)
-                                <div class="bg-white bg-opacity-15 rounded-3 p-3 mt-3">
-                                    <p class="mb-1 fw-semibold"><i class="ti ti-bulb me-2"></i>Kenapa direkomendasikan?</p>
-                                    <p class="mb-0 opacity-90">
+                                <div class="bg-white bg-opacity-90 rounded-3 p-3 mt-3">
+                                    <p class="mb-1 fw-semibold text-dark"><i class="ti ti-bulb me-2 text-warning"></i>Kenapa direkomendasikan?</p>
+                                    <p class="mb-0 text-muted">
                                         Hasil ini didasarkan pada skor kuat di
-                                        <strong>{{ $insightKriterias[0]['nama'] }}</strong>
+                                        <strong class="text-dark">{{ $insightKriterias[0]['nama'] }}</strong>
                                         @if(count($insightKriterias) > 1)
-                                            dan <strong>{{ $insightKriterias[1]['nama'] }}</strong>
+                                            dan <strong class="text-dark">{{ $insightKriterias[1]['nama'] }}</strong>
                                         @endif.
                                     </p>
                                 </div>
