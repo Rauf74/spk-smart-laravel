@@ -2,6 +2,22 @@
 
 @section('title', 'Dashboard - SPK SMART')
 
+@push('styles')
+    <style>
+        /* Responsive font: smaller on mobile */
+        @media (max-width: 768px) {
+            .fs-md-4 { font-size: 1rem !important; }
+        }
+        @media (min-width: 769px) {
+            .fs-md-4 { font-size: 1.5rem !important; }
+        }
+        /* Chart responsive height */
+        .chart-responsive {
+            width: 100%;
+        }
+    </style>
+@endpush
+
 @section('content')
     <!-- Welcome Section -->
     <div class="row">
@@ -131,7 +147,7 @@
                             <p class="card-subtitle mb-0">Perbandingan kriteria Benefit vs Cost</p>
                         </div>
                     </div>
-                    <div id="kriteriaChart" style="height: 300px;"></div>
+                    <div id="kriteriaChart" class="chart-responsive" style="min-height:250px;"></div>
                 </div>
             </div>
         </div>
@@ -146,7 +162,7 @@
                             <p class="card-subtitle mb-0">Distribusi bobot setiap kriteria</p>
                         </div>
                     </div>
-                    <div id="bobotChart" style="height: 300px;"></div>
+                    <div id="bobotChart" class="chart-responsive" style="min-height:250px;"></div>
                 </div>
             </div>
         </div>
@@ -288,63 +304,63 @@
                     <div class="row">
                         @if(Auth::user()->role === 'Guru BK')
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('profile') }}" class="btn btn-outline-primary w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('profile') }}" class="btn btn-outline-primary w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-user-circle me-2"></i>Kelola Profile
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('kriteria.index') }}" class="btn btn-primary w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('kriteria.index') }}" class="btn btn-primary w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-list-check me-2"></i>Kelola Kriteria
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('alternatif.index') }}" class="btn btn-success w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('alternatif.index') }}" class="btn btn-success w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-clipboard-list me-2"></i>Kelola Alternatif
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('pertanyaan.index') }}" class="btn btn-info w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('pertanyaan.index') }}" class="btn btn-info w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-help me-2"></i>Kelola Pertanyaan
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('penilaian.index') }}" class="btn btn-warning w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('penilaian.index') }}" class="btn btn-warning w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-star me-2"></i>Input Penilaian
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('perhitungan.index') }}" class="btn btn-secondary w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('perhitungan.index') }}" class="btn btn-secondary w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-calculator me-2"></i>Lihat Perhitungan
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('perangkingan.index') }}" class="btn btn-dark w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('perangkingan.index') }}" class="btn btn-dark w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-trophy me-2"></i>Hasil Perangkingan
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('user.index') }}" class="btn btn-danger w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('user.index') }}" class="btn btn-danger w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-users me-2"></i>Kelola User
                                 </a>
                             </div>
                         @elseif(Auth::user()->role === 'Siswa')
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('profile') }}" class="btn btn-outline-secondary w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('profile') }}" class="btn btn-outline-secondary w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-user-circle me-2"></i>Profile Saya
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('penilaian.index') }}" class="btn btn-primary w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('penilaian.index') }}" class="btn btn-primary w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-pencil me-2"></i>Mulai Penilaian
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('perhitungan.index') }}" class="btn btn-info w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('perhitungan.index') }}" class="btn btn-info w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-calculator me-2"></i>Lihat Proses Hitung
                                 </a>
                             </div>
                             <div class="col-lg-3 col-md-6 mb-3">
-                                <a href="{{ route('perangkingan.index') }}" class="btn btn-success w-100 py-8 fs-4 rounded-2">
+                                <a href="{{ route('perangkingan.index') }}" class="btn btn-success w-100 py-8 fs-5 fs-md-4 rounded-2">
                                     <i class="ti ti-trophy me-2"></i>Lihat Hasil Akhir
                                 </a>
                             </div>
@@ -375,7 +391,8 @@
                     series: kriteriaValues,
                     chart: {
                         type: 'pie',
-                        height: 300
+                        height: 'auto',
+                        minHeight: 250
                     },
                     labels: kriteriaLabels,
                     colors: ['#5D87FF', '#FA896B'],
@@ -400,7 +417,8 @@
                     }],
                     chart: {
                         type: 'bar',
-                        height: 300
+                        height: 'auto',
+                        minHeight: 250
                     },
                     plotOptions: {
                         bar: {

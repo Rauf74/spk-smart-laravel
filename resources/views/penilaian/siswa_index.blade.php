@@ -239,6 +239,34 @@
         .stepper-step.btn-outline-success {
             cursor: pointer;
         }
+        /* Mobile: bigger radio tap targets */
+        .kuesioner-radio {
+            width: 1.25rem !important;
+            height: 1.25rem !important;
+            min-width: 1.25rem;
+            min-height: 1.25rem;
+            margin-top: 0.15rem;
+        }
+        .kuesioner-radio + .form-check-label {
+            padding-left: 0.5rem;
+        }
+        @media (max-width: 576px) {
+            .kuesioner-radio {
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+                min-width: 1.5rem;
+                min-height: 1.5rem;
+            }
+            .kuesioner-radio + .form-check-label {
+                font-size: 0.95rem;
+                padding-left: 0.75rem;
+            }
+            .stepper-step { min-width: 100px; padding: 6px 8px; font-size: 0.78rem; }
+            .stepper-number { width: 22px; height: 22px; }
+            .card-body { padding: 1rem !important; }
+            .gap-3 { gap: 0.5rem !important; }
+            .d-flex.flex-wrap.gap-3 { gap: 0.75rem !important; }
+        }
     </style>
 @endpush
 

@@ -78,7 +78,7 @@
 
         <div class="py-6 text-center">
             <div class="table-responsive">
-                <table id="myTableKriteria" class="display" style="width:100%">
+                <table id="myTableKriteria" class="display dt-responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -124,7 +124,7 @@
 
         <!-- Modal for adding/editing kriteria -->
         <div class="modal fade" id="kriteriaModal" tabindex="-1" aria-labelledby="kriteriaModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-fullscreen-sm-down">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTitle">Tambah Faktor Penilaian</h5>

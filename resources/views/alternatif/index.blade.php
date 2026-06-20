@@ -31,7 +31,7 @@
 
         <div class="py-6 text-center">
             <div class="table-responsive">
-                <table id="myTableAlternatif" class="display" style="width:100%">
+                <table id="myTableAlternatif" class="display dt-responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -70,7 +70,7 @@
         <!-- Modal -->
         <div class="modal fade" id="alternatifModal" tabindex="-1" aria-labelledby="alternatifModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-fullscreen-sm-down">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTitle">Tambah Program Studi</h5>

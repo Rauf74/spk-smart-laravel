@@ -35,7 +35,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle display datatable-sub"
+                            <table class="table table-striped table-hover align-middle display datatable-sub dt-responsive nowrap"
                                 style="width:100%">
                                 <thead class="table-light">
                                     <tr>
@@ -82,7 +82,7 @@
 
         <!-- Modal -->
         <div class="modal fade" id="subkriteriaModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-fullscreen-sm-down">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTitle">Tambah Pilihan Jawaban</h5>
