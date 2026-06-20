@@ -53,9 +53,31 @@ class PenilaianController extends Controller
                 ->pluck('id_subkriteria', 'id_pertanyaan')
                 ->toArray();
 
+            // Hitung step mana yang aktif (first incomplete step, inferred dari DB)
+            // Kalau semua done, buka step terakhir agar siswa bisa klik Selesai
+            $currentStep = 0;
+            foreach ($kriterias as $idx => $kriteria) {
+                $pertanyaanIds = $kriteria->pertanyaans->pluck('id_pertanyaan')->toArray();
+                $answeredInStep = count(array_intersect_key(
+                    $existingPenilaians,
+                    array_flip($pertanyaanIds)
+                ));
+                $totalInStep = count($pertanyaanIds);
+
+                if ($answeredInStep < $totalInStep) {
+                    $currentStep = $idx;
+                    break;
+                }
+
+                if ($idx === $kriterias->count() - 1) {
+                    $currentStep = $idx;
+                }
+            }
+
             return view('penilaian.siswa_index', compact(
                 'kriterias', 'existingPenilaians',
-                'totalPertanyaan', 'answeredCount', 'progressPersen'
+                'totalPertanyaan', 'answeredCount', 'progressPersen',
+                'currentStep'
             ));
         }
 

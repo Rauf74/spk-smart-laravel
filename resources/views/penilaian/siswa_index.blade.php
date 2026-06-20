@@ -68,10 +68,10 @@
                                 $kriteriaDone = $answeredPerKriteria === $totalPerKriteria && $totalPerKriteria > 0;
                             @endphp
                             <button type="button"
-                                    class="stepper-step btn {{ $index === 0 ? 'btn-primary' : ($kriteriaDone ? 'btn-outline-success' : 'btn-outline-secondary') }}"
+                                    class="stepper-step btn {{ $index === $currentStep ? 'btn-primary' : ($kriteriaDone ? 'btn-outline-success' : 'btn-outline-secondary') }}"
                                     data-step="{{ $index }}"
                                     id="stepperBtn{{ $index }}"
-                                    title="{{ $kriteria->nama_kriteria }} — {{ $answeredPerKriteria }}/{{ $totalPerKriteria }}"> 
+                                    title="{{ $kriteria->nama_kriteria }} — {{ $answeredPerKriteria }}/{{ $totalPerKriteria }}">
                                 <span class="stepper-number">{{ $index + 1 }}</span>
                                 <span class="stepper-label d-none d-md-inline">{{ $kriteria->nama_kriteria }}</span>
                                 <span class="stepper-check ms-1">
@@ -91,7 +91,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     @foreach($kriterias as $stepIndex => $kriteria)
-                        <div class="step-panel {{ $stepIndex === 0 ? 'active' : '' }}"
+                        <div class="step-panel {{ $stepIndex === $currentStep ? 'active' : '' }}"
                              id="step{{ $stepIndex }}"
                              data-total="{{ $kriteria->pertanyaans->count() }}">
 
@@ -173,10 +173,6 @@
                 </div>
             </div>
         </form>
-
-        <div class="py-6 px-6 text-center">
-            <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-        </div>
     </div>
 @endsection
 
@@ -309,18 +305,41 @@
 
             nextBtn.addEventListener('click', function (e) {
                 if (currentStep >= totalSteps - 1) {
-                    // Final step: submit tanpa _partial → redirect ke perangkingan
-                    if (confirm('Kamu yakin sudah selesai? Jawaban bisa diubah lagi nanti.')) {
-                        partialFlag.remove();
-                        form.submit();
-                    } else {
-                        e.preventDefault();
+                    e.preventDefault();
+
+                    // Validasi: semua pertanyaan terjawab?
+                    const checkedCount = document.querySelectorAll('.kuesioner-radio:checked').length;
+                    if (checkedCount < totalPertanyaan) {
+                        const sisa = totalPertanyaan - checkedCount;
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Belum Selesai',
+                            html: 'Masih ada <strong>' + sisa + '</strong> pertanyaan yang belum dijawab.<br>Lanjutkan mengisi dulu ya.',
+                            confirmButtonText: 'Oke',
+                            customClass: { popup: 'rounded-4' }
+                        });
+                        return;
                     }
-                } else {
-                    // Intermediate step: auto-save (submit dengan _partial=1)
-                    // Step selanjutnya akan aktif setelah reload
+
+                    // SweetAlert konfirmasi final submit
+                    Swal.fire({
+                        title: 'Selesai?',
+                        text: 'Kamu yakin sudah selesai? Jawaban bisa diubah lagi nanti.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Lihat Hasil!',
+                        cancelButtonText: 'Lanjutkan Mengisi',
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        customClass: { popup: 'rounded-4' }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            partialFlag.remove();
+                            form.submit();
+                        }
+                    });
                 }
-                // Biarkan form submit (nextBtn sekarang type="submit")
+                // Intermediate steps: biarkan form submit (auto-save partial)
             });
 
             // ========== PROGRESS TRACKING ==========
@@ -370,7 +389,7 @@
             });
 
             // Init
-            showStep(0);
+            showStep({{ $currentStep }});
             updateAllProgress();
 
             // ========== KEYBOARD NAVIGATION ==========
