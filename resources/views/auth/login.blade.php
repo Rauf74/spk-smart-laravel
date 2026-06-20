@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
@@ -7,260 +7,162 @@
     <title>Login - SPK Rekomendasi Program Studi</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/smk3.png') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.36.0/tabler-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        #togglePassword.active {
-            transform: scale(0.95);
-            transition: transform 0.1s ease;
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f6f9fc;
+            padding: 20px;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+        .auth-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+        .input-group-text {
+            background: #fff;
+            border-right: none;
+            color: #5a6a85;
+        }
+        .form-control {
+            border-left: none;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #dee2e6;
+        }
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: #5D87FF;
+        }
+        .btn-toggle-password {
+            border-left: none;
+            background: #fff;
+            color: #5a6a85;
+        }
+        .btn-toggle-password:hover,
+        .btn-toggle-password:focus {
+            background: #fff;
+            color: #5D87FF;
         }
     </style>
 </head>
 
-<body class="bg-light">
-    <div class="position-fixed top-0 start-0 w-100 h-100"
-        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: -2;"></div>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card card">
+            <div class="card-body p-4 p-md-5">
+                {{-- Logo & Header --}}
+                <div class="text-center mb-4">
+                    <img src="{{ asset('assets/images/smk3.png') }}" alt="Logo" class="auth-logo mb-3">
+                    <h4 class="fw-bold mb-1">SPK Rekomendasi Program Studi</h4>
+                    <p class="text-muted small mb-0">SMK Muhammadiyah 3 Tangerang Selatan</p>
+                </div>
 
-    <div class="page-wrapper" id="main-wrapper">
-        <div class="container-fluid">
-            <div class="row justify-content-center align-items-center min-vh-100 p-4">
-                <div class="col-12 col-lg-10">
-                    <div class="row g-4">
-                        <!-- Left Card (Header) -->
-                        <div class="col-12 col-lg-4">
-                            <div
-                                class="card border-0 shadow-lg rounded-4 p-4 h-100 d-flex flex-column justify-content-center align-items-center">
-                                <div class="text-center">
-                                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3"
-                                        style="width: 80px; height: 80px;">
-                                        <img src="{{ asset('assets/images/smk3.png') }}" alt="Logo Sekolah"
-                                            style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                                    </div>
-                                    <h2 class="fw-bold text-dark mb-2">Masuk ke Sistem</h2>
-                                    <p class="fs-6 text-muted mb-0">SMK Muhammadiyah 3 Tangerang Selatan</p>
-                                    <p class="fs-6 text-muted mb-0">Sistem Pendukung Keputusan Rekomendasi Program Studi
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Right Column -->
-                        <div class="col-12 col-lg-8">
-                            <!-- Info Login Card -->
-                            <div class="card border-0 bg-white bg-opacity-90 rounded-3 p-3 shadow-sm">
-                                <h6 class="mb-3 fw-semibold text-dark">
-                                    <i class="bi bi-info-circle me-2 text-info"></i>
-                                    Informasi Login
-                                </h6>
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="bi bi-person-badge text-primary me-2"></i>
-                                                <strong class="text-primary">Guru BK</strong>
-                                            </div>
-                                            <small class="text-muted">Akses penuh ke semua fitur sistem SPK</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="bg-success bg-opacity-10 rounded-3 p-3">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="bi bi-mortarboard text-success me-2"></i>
-                                                <strong class="text-success">Siswa</strong>
-                                            </div>
-                                            <small class="text-muted">Dashboard, Penilaian, dan Profil pengguna</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Right Card (Form) -->
-                            <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5">
-                                <div class="card-body">
-                                    <div class="card-header bg-gradient text-white text-center py-4"
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                        <h4 class="mb-0 fw-semibold">
-                                            <i class="bi bi-box-arrow-in-right me-2"></i>
-                                            Login Pengguna
-                                        </h4>
-                                    </div>
+                {{-- Error Alert --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger d-flex align-items-center py-2 mb-3">
+                        <i class="ti ti-alert-circle me-2"></i>
+                        <small>{{ $errors->first() }}</small>
+                    </div>
+                @endif
 
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger mt-3">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>
-                                            {{ $errors->first() }}
-                                        </div>
-                                    @endif
+                {{-- Form --}}
+                <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate>
+                    @csrf
 
-                                    <form method="POST" action="{{ route('login') }}" class="needs-validation"
-                                        novalidate>
-                                        @csrf
-                                        <div class="mb-4">
-                                            <label for="username" class="form-label fw-semibold text-dark">
-                                                <i class="bi bi-person-fill me-2 text-primary"></i>Username
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0">
-                                                    <i class="bi bi-person text-muted"></i>
-                                                </span>
-                                                <input type="text" class="form-control border-start-0 ps-0"
-                                                    id="username" name="username" placeholder="Masukkan username Anda"
-                                                    value="{{ old('username') }}" required>
-                                                <div class="invalid-feedback">
-                                                    <i class="bi bi-exclamation-triangle me-1"></i>Username wajib diisi.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="password" class="form-label fw-semibold text-dark">
-                                                <i class="bi bi-shield-lock me-2 text-warning"></i>Password
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0">
-                                                    <i class="bi bi-lock text-muted"></i>
-                                                </span>
-                                                <input type="password"
-                                                    class="form-control border-start-0 border-end-0 ps-0" id="password"
-                                                    name="password" placeholder="Masukkan password Anda" required>
-                                                <button class="btn btn-outline-secondary border-start-0" type="button"
-                                                    id="togglePassword">
-                                                    <i class="bi bi-eye" id="toggleIcon"></i>
-                                                </button>
-                                                <div class="invalid-feedback">
-                                                    <i class="bi bi-exclamation-triangle me-1"></i>Password wajib diisi.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-grid gap-2 mb-4">
-                                            <button type="submit"
-                                                class="btn btn-primary btn-lg rounded-3 fw-semibold py-3"
-                                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                                Masuk ke Sistem
-                                            </button>
-                                        </div>
-                                        <div class="text-center mb-4">
-                                            <hr class="my-3">
-                                            <span class="bg-white px-3 text-muted small">Belum memiliki akun?</span>
-                                        </div>
-                                        <div class="text-center">
-                                            <a href="{{ route('register') }}"
-                                                class="btn btn-outline-primary btn-lg rounded-3 w-100 fw-semibold">
-                                                <i class="bi bi-person-plus me-2"></i>
-                                                Daftar Akun Baru
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <!-- Footer Info -->
-                            <div class="mt-4">
-                                <div
-                                    class="card mb-0 border-0 bg-white bg-opacity-90 rounded-3 p-3 shadow-sm d-flex flex-row justify-content-around align-items-center">
-                                    <p class="text-muted small mb-1">
-                                        <i class="bi bi-shield-check me-1"></i>
-                                        Login aman dengan enkripsi SSL
-                                    </p>
-                                    <p class="text-muted small mb-0">
-                                        <i class="bi bi-telephone me-1"></i>
-                                        Butuh bantuan? Hubungi administrator
-                                    </p>
-                                </div>
-                            </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-semibold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start"><i class="ti ti-user"></i></span>
+                            <input type="text" class="form-control rounded-end" id="username" name="username"
+                                placeholder="Masukkan username" value="{{ old('username') }}" required>
                         </div>
                     </div>
-                </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start"><i class="ti ti-lock"></i></span>
+                            <input type="password" class="form-control border-end-0" id="password" name="password"
+                                placeholder="Masukkan password" required>
+                            <button class="btn btn-toggle-password rounded-end border border-start-0" type="button"
+                                id="togglePassword">
+                                <i class="ti ti-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg fw-semibold py-2">
+                            <i class="ti ti-login me-2"></i>Masuk
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <small class="text-muted">Belum punya akun?</small>
+                        <a href="{{ route('register') }}" class="fw-semibold text-decoration-none ms-1">Daftar</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/simplebar/dist/simplebar.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <script>
-        // Toggle password visibility
+        // Toggle password
         document.getElementById('togglePassword').addEventListener('click', function () {
             const password = document.getElementById('password');
             const icon = document.getElementById('toggleIcon');
             if (password.type === 'password') {
                 password.type = 'text';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
+                icon.classList.replace('ti-eye', 'ti-eye-off');
             } else {
                 password.type = 'password';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
+                icon.classList.replace('ti-eye-off', 'ti-eye');
             }
         });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script>
+
         $(document).ready(function () {
-            // Check for Registration Success Flash
+            // Register success confetti
             @if(session('register_success'))
                 Swal.fire({
                     icon: 'success',
-                    title: '<i class="bi bi-check-circle-fill text-success"></i><br>Pendaftaran Berhasil!',
-                    html: `
-                            <div class="alert alert-success mt-3">
-                                <i class="bi bi-shield-check me-2"></i>
-                                Akun siswa berhasil didaftarkan dalam sistem SPK.
-                            </div>
-                            <p class="mb-3">Selamat datang, <strong>{{ session('register_success') }}</strong>!</p>
-                            <p class="text-muted">Silakan login dengan akun yang baru dibuat.</p>
-                        `,
-                    timer: 2000,
-                    timerProgressBar: true,
+                    title: 'Pendaftaran Berhasil!',
+                    html: '<p class="mb-0">Selamat datang, <strong>{{ session('register_success') }}</strong>!<br>Silakan login dengan akun baru.</p>',
+                    timer: 2500,
                     showConfirmButton: false,
-                    customClass: {
-                        popup: 'rounded-4'
-                    },
-                    didOpen: function () {
-                        // Confetti animation
-                        confetti({
-                            particleCount: 100,
-                            spread: 70,
-                            origin: { y: 0.6 }
-                        });
-                    }
+                    customClass: { popup: 'rounded-4' },
+                    didOpen: () => confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } })
                 });
             @endif
 
-            // Enhanced form submission
+            // Loading saat submit
             $('form').on('submit', function (e) {
                 if (this.checkValidity()) {
                     e.preventDefault();
-
-                    // Show enhanced loading from spk-smart-php
                     Swal.fire({
-                        title: '<div class="spinner-border text-primary mb-3" role="status"></div>',
-                        html: `
-                            <h5 class="mb-3">Memverifikasi Login</h5>
-                            <div class="progress mb-3">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <p class="text-muted mb-0">Sedang memeriksa kredensial...</p>
-                        `,
+                        title: '<div class="spinner-border text-primary" role="status"></div>',
+                        html: '<p class="mb-0 text-muted">Memverifikasi login...</p>',
                         allowOutsideClick: false,
                         showConfirmButton: false,
-                        customClass: {
-                            popup: 'rounded-4'
-                        },
-                        didOpen: function () {
-                            // Simulate progress
-                            let progress = 0;
-                            const progressBar = document.querySelector('.progress-bar');
-                            const interval = setInterval(() => {
-                                progress += 5; // Slower increment because page reload takes time
-                                if (progress <= 90) {
-                                    progressBar.style.width = progress + '%';
-                                } else {
-                                    clearInterval(interval);
-                                }
-                            }, 100);
-                        }
+                        customClass: { popup: 'rounded-4' }
                     });
-
                     this.submit();
                 }
             });
