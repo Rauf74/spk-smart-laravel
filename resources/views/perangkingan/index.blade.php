@@ -348,6 +348,40 @@
                 </div>
             </div>
         @endif
+
+        {{-- Catatan Konseling (Guru BK Only) --}}
+        @if(Auth::user()->role === 'Guru BK' && isset($userId))
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-semibold mb-3">
+                                <i class="ti ti-notes me-2 text-primary"></i>Catatan Konseling
+                            </h5>
+                            <p class="text-muted small mb-3">Tulis catatan hasil konseling untuk siswa ini. Catatan hanya terlihat oleh Guru BK yang membuatnya.</p>
+                            <form method="POST" action="{{ route('perangkingan.catatan.store') }}">
+                                @csrf
+                                <input type="hidden" name="id_user" value="{{ $userId }}">
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="catatan" name="catatan" rows="4"
+                                        placeholder="Contoh: Siswa menunjukkan minat tinggi di bidang teknologi. Direkomendasikan untuk diskusi lebih lanjut dengan orang tua...">{{ $catatanKonseling->catatan ?? '' }}</textarea>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    @if($catatanKonseling)
+                                        <small class="text-muted">Terakhir diperbarui: {{ $catatanKonseling->updated_at->format('d M Y H:i') }}</small>
+                                    @else
+                                        <span></span>
+                                    @endif
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ti ti-device-floppy me-2"></i>Simpan Catatan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
 

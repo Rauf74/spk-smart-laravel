@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Services\SmartCalculationService;
+use App\Models\CatatanKonseling;
+use Illuminate\Http\Request;
 
 /**
  * Controller untuk halaman Perangkingan.
@@ -67,6 +69,11 @@ class PerangkinganController extends Controller
             }
         }
 
+        // Ambil catatan konseling jika ada
+        $catatanKonseling = CatatanKonseling::where('id_user', $userId)
+            ->where('id_guru', $currentUser->id_user)
+            ->first();
+
         return view('perangkingan.index', [
             'kriterias'         => $kriterias,
             'hasil'             => $hasil,
@@ -75,6 +82,33 @@ class PerangkinganController extends Controller
             'topAlternatif'     => $topAlternatif,
             'persenKecocokan'   => $persenKecocokan,
             'insightKriterias'  => $insightKriterias,
+            'catatanKonseling'  => $catatanKonseling,
         ]);
+    }
+
+    /**
+     * Simpan atau update catatan konseling Guru BK untuk siswa.
+     */
+    public function storeCatatan(Request $request)
+    {
+        $request->validate([
+            'id_user' => 'required|exists:users,id_user',
+            'catatan' => 'required|string|max:2000',
+        ]);
+
+        $guruId = Auth::user()->id_user;
+
+        CatatanKonseling::updateOrCreate(
+            [
+                'id_user' => $request->id_user,
+                'id_guru' => $guruId,
+            ],
+            [
+                'catatan' => $request->catatan,
+            ]
+        );
+
+        return redirect()->route('perangkingan.index', ['id_user' => $request->id_user])
+            ->with('success', 'Catatan konseling berhasil disimpan.');
     }
 }

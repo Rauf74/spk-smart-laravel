@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('penilaian', PenilaianController::class)->only(['index', 'store', 'edit']);
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
+    Route::post('perangkingan/catatan', [PerangkinganController::class, 'storeCatatan'])->name('perangkingan.catatan.store');
 
     // Master Data (ADMIN ONLY - Guru BK)
     // Master Data (ADMIN ONLY - Guru BK)
