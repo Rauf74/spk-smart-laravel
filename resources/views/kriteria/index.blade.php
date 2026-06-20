@@ -11,7 +11,54 @@
         <h1 class="mb-4">Data Kriteria</h1>
         <p class="fs-6 mb-4">Berisi aspek-aspek penilaian yang menjadi dasar untuk merekomendasikan program studi.</p>
 
+        {{-- Total Bobot Indicator --}}
+        @php
+            $persenBobot = min(100, round($totalBobot, 2));
+            $sisaBobot = max(0, round(100 - $totalBobot, 2));
+            $progressClass = $totalBobot == 100 ? 'bg-success' : ($totalBobot > 100 ? 'bg-danger' : 'bg-warning');
+            $alertClass = $totalBobot == 100 ? 'alert-success' : ($totalBobot > 100 ? 'alert-danger' : 'alert-warning');
+            $alertIcon = $totalBobot == 100 ? 'ti-check' : ($totalBobot > 100 ? 'ti-alert-circle' : 'ti-info-circle');
+            $alertTitle = $totalBobot == 100 ? 'Bobot Sudah Pas' : ($totalBobot > 100 ? 'Bobot Melebihi 100%' : 'Bobot Belum Lengkap');
+            $alertMsg = $totalBobot == 100
+                ? 'Total bobot sudah 100%. Sistem siap digunakan untuk perhitungan.'
+                : ($totalBobot > 100
+                    ? 'Total bobot melebihi 100%. Kurangi bobot beberapa kriteria agar total tepat 100%.'
+                    : 'Total bobot saat ini ' . $persenBobot . '%. Tambah atau sesuaikan bobot agar total tepat 100%.');
+        @endphp
 
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                        <h5 class="fw-bold mb-1">Total Bobot</h5>
+                        <span class="fs-2 fw-bold {{ $totalBobot == 100 ? 'text-success' : ($totalBobot > 100 ? 'text-danger' : 'text-warning') }}">
+                            {{ $persenBobot }}%
+                        </span>
+                        <small class="text-muted d-block">dari 100%</small>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="progress" style="height: 24px; border-radius: 12px;">
+                            <div class="progress-bar {{ $progressClass }} progress-bar-striped {{ $totalBobot != 100 ? 'progress-bar-animated' : '' }}"
+                                 role="progressbar"
+                                 style="width: {{ min(100, $persenBobot) }}%">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted">0%</small>
+                            <small class="text-muted">50%</small>
+                            <small class="text-muted">100%</small>
+                        </div>
+
+                        <div class="alert {{ $alertClass }} d-flex align-items-center mt-3 mb-0 py-2" role="alert">
+                            <i class="ti {{ $alertIcon }} fs-4 me-3"></i>
+                            <div>
+                                <strong>{{ $alertTitle }}</strong> — {{ $alertMsg }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -113,12 +160,12 @@
                                 <label for="bobot" class="form-label">Bobot</label>
                                 <input type="text" class="form-control" id="bobot" name="bobot" required
                                     pattern="[0-9]+([.][0-9]{1,2})?" placeholder="contoh: 30, 40, 45.5">
-                                <small class="text-muted">Gunakan titik (.) untuk desimal (contoh: 25.5)</small>
+                                <small class="text-muted">Gunakan titik (.) untuk desimal (contoh: 25.5). Sisa bobot tersedia: <strong class="text-primary" id="sisaBobotLabel">{{ $sisaBobot }}%</strong></small>
                             </div>
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                <button type="submit" class="btn btn-primary" id="btnSimpanBobot">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -127,9 +174,6 @@
         </div>
     </div>
 
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 @endsection
 
 @push('scripts')
@@ -148,6 +192,8 @@
             document.getElementById('nama_kriteria').value = '';
             document.getElementById('jenis').value = '';
             document.getElementById('bobot').value = '';
+            document.getElementById('sisaBobotLabel').innerText = '{{ $sisaBobot }}%';
+            document.getElementById('btnSimpanBobot').disabled = {{ $totalBobot >= 100 ? 'true' : 'false' }};
         }
 
         function editKriteria(id, kode, nama, jenis, bobot) {
@@ -159,6 +205,11 @@
             document.getElementById('nama_kriteria').value = nama;
             document.getElementById('jenis').value = jenis;
             document.getElementById('bobot').value = bobot;
+
+            var bobotLama = parseFloat(bobot) || 0;
+            var sisaEdit = {{ $sisaBobot }} + bobotLama;
+            document.getElementById('sisaBobotLabel').innerText = sisaEdit.toFixed(2) + '%';
+            document.getElementById('btnSimpanBobot').disabled = false;
 
             var modal = new bootstrap.Modal(document.getElementById('kriteriaModal'));
             modal.show();
