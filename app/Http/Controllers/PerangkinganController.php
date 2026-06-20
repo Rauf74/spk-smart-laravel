@@ -39,12 +39,42 @@ class PerangkinganController extends Controller
 
         // Jalankan perhitungan SMART via service dengan hasil diurutkan
         $result = $smartService->calculate($userId, sortDescending: true);
+        $kriterias = $result['kriterias'];
+        $hasil = $result['hasil'];
+
+        // === PREPARE PRIMARY LAYER DATA (hasil awam) ===
+        $topAlternatif = null;
+        $persenKecocokan = 0;
+        $insightKriterias = [];
+
+        if (!empty($hasil)) {
+            $topAlternatif = $hasil[0];
+            $persenKecocokan = min(100, round($topAlternatif['nilai_akhir'] * 100));
+
+            // Ambil 2 kriteria dengan utility tertinggi di winner
+            $utilities = $topAlternatif['utility'];
+            arsort($utilities);
+            $topTwo = array_slice($utilities, 0, 2, true);
+
+            foreach ($topTwo as $idKriteria => $utilityVal) {
+                $kriteria = $kriterias->firstWhere('id_kriteria', $idKriteria);
+                if ($kriteria) {
+                    $insightKriterias[] = [
+                        'nama' => $kriteria->nama_kriteria,
+                        'utility' => $utilityVal,
+                    ];
+                }
+            }
+        }
 
         return view('perangkingan.index', [
-            'kriterias' => $result['kriterias'],
-            'hasil'     => $result['hasil'],
-            'users'     => $users,
-            'userId'    => $userId,
+            'kriterias'         => $kriterias,
+            'hasil'             => $hasil,
+            'users'             => $users,
+            'userId'            => $userId,
+            'topAlternatif'     => $topAlternatif,
+            'persenKecocokan'   => $persenKecocokan,
+            'insightKriterias'  => $insightKriterias,
         ]);
     }
 }
