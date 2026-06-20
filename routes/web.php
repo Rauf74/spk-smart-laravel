@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
     Route::post('perangkingan/catatan', [PerangkinganController::class, 'storeCatatan'])->name('perangkingan.catatan.store');
+    Route::get('perangkingan/pdf', [PerangkinganController::class, 'exportPDF'])->name('perangkingan.pdf');
 
     // Master Data (ADMIN ONLY - Guru BK)
     // Master Data (ADMIN ONLY - Guru BK)

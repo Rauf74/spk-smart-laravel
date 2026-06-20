@@ -176,6 +176,9 @@
                 <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="window.print()">
                     <i class="ti ti-printer me-2"></i>Cetak Hasil
                 </button>
+                <a href="{{ route('perangkingan.pdf', ['id_user' => $userId]) }}" class="btn btn-primary btn-lg px-5">
+                    <i class="ti ti-file-type-pdf me-2"></i>Download PDF
+                </a>
             </div>
 
             {{-- ======== SECONDARY LAYER: Detail Perhitungan SMART ======== --}}

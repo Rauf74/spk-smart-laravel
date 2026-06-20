@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\SmartCalculationService;
 use App\Models\CatatanKonseling;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 /**
  * Controller untuk halaman Perangkingan.
@@ -110,5 +111,37 @@ class PerangkinganController extends Controller
 
         return redirect()->route('perangkingan.index', ['id_user' => $request->id_user])
             ->with('success', 'Catatan konseling berhasil disimpan.');
+    }
+
+    /**
+     * Export hasil rekomendasi ke PDF.
+     */
+    public function exportPDF(Request $request, SmartCalculationService $smartService)
+    {
+        $currentUser = Auth::user();
+        $userId = $currentUser->id_user;
+
+        if ($currentUser->role === 'Guru BK' && $request->has('id_user')) {
+            $userId = $request->id_user;
+        }
+
+        $siswa = User::findOrFail($userId);
+        $result = $smartService->calculate($userId, sortDescending: true);
+        $kriterias = $result['kriterias'];
+        $hasil = $result['hasil'];
+
+        $topAlternatif = $hasil[0] ?? null;
+        $persenKecocokan = $topAlternatif ? min(100, round($topAlternatif['nilai_akhir'] * 100)) : 0;
+
+        $pdf = Pdf::loadView('perangkingan.pdf', [
+            'siswa' => $siswa,
+            'kriterias' => $kriterias,
+            'hasil' => $hasil,
+            'topAlternatif' => $topAlternatif,
+            'persenKecocokan' => $persenKecocokan,
+            'tanggal' => now()->format('d F Y'),
+        ]);
+
+        return $pdf->download('Hasil-Rekomendasi-' . $siswa->nama_user . '.pdf');
     }
 }
