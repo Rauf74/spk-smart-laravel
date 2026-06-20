@@ -135,6 +135,131 @@
         @endif
     </div>
 
+    {{-- STATUS SISWA (Guru BK Only) --}}
+    @if(Auth::user()->role === 'Guru BK')
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <h5 class="card-title fw-semibold mb-1">Status Penilaian Siswa</h5>
+                                <p class="text-muted small mb-0">Total {{ $total_siswa }} siswa &middot; {{ $total_pertanyaan }} pertanyaan per siswa</p>
+                            </div>
+                            <a href="{{ route('penilaian.index') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="ti ti-list me-1"></i>Detail Penilaian
+                            </a>
+                        </div>
+
+                        {{-- Summary badges --}}
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 rounded-3 bg-light-danger">
+                                    <div class="bg-danger text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                        <i class="ti ti-circle-x fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-0">{{ $belum_isi }}</h5>
+                                        <small class="text-muted">Belum Mengisi</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 rounded-3 bg-light-warning">
+                                    <div class="bg-warning text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                        <i class="ti ti-loader fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-0">{{ $sedang_isi }}</h5>
+                                        <small class="text-muted">Sedang Mengisi</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center p-3 rounded-3 bg-light-success">
+                                    <div class="bg-success text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                        <i class="ti ti-circle-check fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-0">{{ $selesai_isi }}</h5>
+                                        <small class="text-muted">Selesai</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Table --}}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Siswa</th>
+                                        <th>Username</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($siswa_status as $index => $siswa)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="fw-semibold">{{ $siswa->nama_user }}</td>
+                                            <td><small class="text-muted">{{ $siswa->username }}</small></td>
+                                            <td>
+                                                <span class="badge {{ $siswa->status_class }} d-inline-flex align-items-center gap-1">
+                                                    <i class="{{ $siswa->status_icon }}"></i>
+                                                    {{ $siswa->status_label }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($siswa->status === 'sedang')
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="progress flex-grow-1" style="height:6px;min-width:60px;">
+                                                            <div class="progress-bar bg-warning" style="width:{{ $siswa->progress }}%"></div>
+                                                        </div>
+                                                        <small class="text-muted">{{ $siswa->progress }}%</small>
+                                                    </div>
+                                                @elseif($siswa->status === 'selesai')
+                                                    <div class="progress" style="height:6px;min-width:60px;">
+                                                        <div class="progress-bar bg-success" style="width:100%"></div>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($siswa->status === 'selesai')
+                                                    <a href="{{ route('perangkingan.index', ['id_user' => $siswa->id_user]) }}" class="btn btn-sm btn-success">
+                                                        <i class="ti ti-eye me-1"></i>Lihat Hasil
+                                                    </a>
+                                                @elseif($siswa->status === 'sedang')
+                                                    <a href="{{ route('penilaian.index', ['id_user' => $siswa->id_user]) }}" class="btn btn-sm btn-warning">
+                                                        <i class="ti ti-pencil me-1"></i>Lanjutkan
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted small">Menunggu</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4 text-muted">
+                                                <i class="ti ti-users fs-3 mb-2 d-block"></i>
+                                                Belum ada data siswa
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Charts Section -->
     <div class="row">
         <!-- Kriteria Distribution Chart -->

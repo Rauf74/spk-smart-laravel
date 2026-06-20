@@ -38,6 +38,48 @@ class DashboardController extends Controller
         $totalPenilaian = Penilaian::distinct('id_user')->count('id_user');
 
         // ==============================================
+        // STATUS SISWA (Guru BK Dashboard)
+        // ==============================================
+        $totalPertanyaan = \App\Models\Pertanyaan::count();
+        $siswaStatus = User::where('role', 'Siswa')
+            ->leftJoin('penilaian as p', 'users.id_user', '=', 'p.id_user')
+            ->selectRaw('
+                users.id_user,
+                users.nama_user,
+                users.username,
+                COUNT(DISTINCT p.id_pertanyaan) as jawaban_count
+            ')
+            ->groupBy('users.id_user', 'users.nama_user', 'users.username')
+            ->orderBy('users.nama_user')
+            ->get()
+            ->map(function ($siswa) use ($totalPertanyaan) {
+                $jawaban = $siswa->jawaban_count;
+                if ($jawaban == 0) {
+                    $siswa->status = 'belum';
+                    $siswa->status_label = 'Belum Mengisi';
+                    $siswa->status_class = 'bg-danger';
+                    $siswa->status_icon = 'ti ti-circle-x';
+                } elseif ($jawaban < $totalPertanyaan) {
+                    $siswa->status = 'sedang';
+                    $siswa->status_label = 'Sedang Mengisi';
+                    $siswa->status_class = 'bg-warning';
+                    $siswa->status_icon = 'ti ti-loader';
+                    $siswa->progress = round(($jawaban / $totalPertanyaan) * 100);
+                } else {
+                    $siswa->status = 'selesai';
+                    $siswa->status_label = 'Selesai';
+                    $siswa->status_class = 'bg-success';
+                    $siswa->status_icon = 'ti ti-circle-check';
+                    $siswa->progress = 100;
+                }
+                return $siswa;
+            });
+
+        $belumIsi = $siswaStatus->where('status', 'belum')->count();
+        $sedangIsi = $siswaStatus->where('status', 'sedang')->count();
+        $selesaiIsi = $siswaStatus->where('status', 'selesai')->count();
+
+        // ==============================================
         // DATA UNTUK GRAFIK
         // ==============================================
 
@@ -86,6 +128,11 @@ class DashboardController extends Controller
             'avg_bobot' => $avgBobot,
             'alternatif_terbaru' => $alternatifTerbaru,
             'recent_activities' => $recentActivities,
+            'siswa_status' => $siswaStatus,
+            'belum_isi' => $belumIsi,
+            'sedang_isi' => $sedangIsi,
+            'selesai_isi' => $selesaiIsi,
+            'total_pertanyaan' => $totalPertanyaan,
         ]);
     }
 
