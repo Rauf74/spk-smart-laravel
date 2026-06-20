@@ -37,6 +37,18 @@
             from { opacity: 0; transform: translateY(10px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+        /* Print-friendly styles */
+        @media print {
+            .left-sidebar, .app-header, .btn, .detail-toggle, .dataTables_length, .dataTables_filter, .dataTables_paginate, .dataTables_info { display: none !important; }
+            .body-wrapper { margin-left: 0 !important; }
+            .rekomendasi-hero { background: #5D87FF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+            .detail-section { display: block !important; }
+            body { font-size: 12pt; }
+            h1 { font-size: 18pt; }
+            table { font-size: 10pt; }
+            .top3-card { transform: none !important; }
+        }
     </style>
 @endpush
 
@@ -153,13 +165,16 @@
                 @endforeach
             </div>
 
-            {{-- Toggle Detail --}}
-            <div class="text-center mb-4">
-                <button type="button" class="btn btn-outline-secondary btn-lg px-5" id="btnToggleDetail"
+            {{-- Toggle Detail + Print --}}
+            <div class="text-center mb-4 d-flex flex-wrap justify-content-center gap-3">
+                <button type="button" class="btn btn-outline-secondary btn-lg px-5 detail-toggle" id="btnToggleDetail"
                         onclick="document.getElementById('detailSection').classList.toggle('show'); this.classList.toggle('active');">
                     <i class="ti ti-calculator me-2"></i>
                     <span class="label-show">Lihat Detail Perhitungan SMART</span>
                     <span class="label-hide d-none">Sembunyikan Detail</span>
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="window.print()">
+                    <i class="ti ti-printer me-2"></i>Cetak Hasil
                 </button>
             </div>
 
