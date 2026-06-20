@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Kriteria - SPK SMART')
+@section('title', 'Faktor Penilaian - SPK SMART')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data Kriteria</h1>
+        <h1 class="mb-4">Faktor Penilaian</h1>
         <p class="fs-6 mb-4">Berisi aspek-aspek penilaian yang menjadi dasar untuk merekomendasikan program studi.</p>
 
         {{-- Total Bobot Indicator --}}
@@ -127,7 +127,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Tambah Kriteria</h5>
+                        <h5 class="modal-title" id="modalTitle">Tambah Faktor Penilaian</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

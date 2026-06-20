@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Subkriteria - SPK SMART')
+@section('title', 'Pilihan Jawaban - SPK SMART')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -8,11 +8,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data Subkriteria</h1>
-        <p class="fs-6 mb-4">Merinci setiap kriteria menjadi poin-poin terukur menggunakan skala 1-5 untuk penilaian yang
-            lebih detail.</p>
-
-
+        <h1 class="mb-4">Pilihan Jawaban</h1>
+        <p class="fs-6 mb-4">Daftar pilihan jawaban untuk setiap faktor penilaian.</p>
 
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -88,7 +85,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Tambah Subkriteria</h5>
+                        <h5 class="modal-title" id="modalTitle">Tambah Pilihan Jawaban</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -129,9 +126,6 @@
         </div>
     </div>
 
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 @endsection
 
 @push('scripts')

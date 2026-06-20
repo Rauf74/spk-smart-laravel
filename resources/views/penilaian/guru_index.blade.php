@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Data Penilaian - Guru BK')
+@section('title', 'Penilaian Siswa - Guru BK')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-4">Data Penilaian - Guru BK</h1>
+    <h1 class="mb-4">Penilaian Siswa</h1>
     <p class="fs-6 mb-4">Menampilkan rekapitulasi jawaban kuesioner dari setiap siswa, lengkap dengan ringkasan nilai per kriteria.</p>
 
     {{-- Dropdown Pilih Siswa --}}
@@ -124,8 +124,5 @@
         </div>
     @endif
     
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 </div>
 @endsection

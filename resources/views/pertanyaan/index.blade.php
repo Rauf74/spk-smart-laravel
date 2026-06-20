@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Pertanyaan - SPK SMART')
+@section('title', 'Daftar Pertanyaan - SPK SMART')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -8,8 +8,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data Pertanyaan</h1>
-        <p class="fs-6 mb-4">Berisi pertanyaan yang akan diajukan kepada siswa untuk setiap kriteria dan alternatif.</p>
+        <h1 class="mb-4">Daftar Pertanyaan</h1>
+        <p class="fs-6 mb-4">Pertanyaan-pertanyaan yang akan dijawab siswa dalam kuesioner penilaian.</p>
 
 
 
@@ -126,9 +126,6 @@
         </div>
     </div>
 
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 @endsection
 
 @push('scripts')

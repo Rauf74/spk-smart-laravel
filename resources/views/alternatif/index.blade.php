@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Alternatif - SPK SMART')
+@section('title', 'Program Studi - SPK SMART')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -8,8 +8,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data Alternatif</h1>
-        <p class="fs-6 mb-4">Berisi daftar program studi yang akan direkomendasikan kepada siswa.</p>
+        <h1 class="mb-4">Program Studi</h1>
+        <p class="fs-6 mb-4">Daftar program studi yang tersedia sebagai alternatif rekomendasi.</p>
 
 
 
@@ -73,7 +73,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Tambah Alternatif</h5>
+                        <h5 class="modal-title" id="modalTitle">Tambah Program Studi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -104,9 +104,6 @@
         </div>
     </div>
 
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 @endsection
 
 @push('scripts')

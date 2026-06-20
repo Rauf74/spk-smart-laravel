@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Perhitungan - SPK SMART')
+@section('title', 'Detail Perhitungan - SPK SMART')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -8,8 +8,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data Perhitungan</h1>
-        <p class="fs-6 mb-4">Hasil perhitungan menggunakan metode SMART (Simple Multi-Attribute Rating Technique).</p>
+        <h1 class="mb-4">Detail Perhitungan</h1>
+        <p class="fs-6 mb-4">Tabel detail perhitungan metode SMART: bobot normalisasi, utility, dan nilai akhir tiap alternatif.</p>
 
         {{-- Dropdown Pilih Siswa (Hanya untuk Guru BK) --}}
         @if(Auth::user()->role === 'Guru BK')
@@ -159,9 +159,6 @@
         @endif
     </div>
 
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by RAUF</p>
-    </div>
 @endsection
 
 @push('scripts')
