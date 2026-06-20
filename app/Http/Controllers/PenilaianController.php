@@ -26,22 +26,37 @@ class PenilaianController extends Controller
         $currentUser = Auth::user();
         $targetUserId = $currentUser->id_user;
 
-        // 1. Logika khusus untuk Siswa: Tampilkan form gabungan (Data Penilaian Saya)
+        // 1. Logika khusus untuk Siswa: Wizard kuesioner per kriteria
         if ($currentUser->role === 'Siswa') {
-            $alternatifs = Alternatif::with([
-                'pertanyaan' => function ($q) {
-                    $q->join('kriteria', 'pertanyaan.id_kriteria', '=', 'kriteria.id_kriteria')
-                        ->select('pertanyaan.*')
-                        ->orderBy('kriteria.id_kriteria')
-                        ->with(['kriteria.subkriteria']);
-                }
-            ])->get();
+            // Ambil semua kriteria + subkriteria
+            $kriterias = \App\Models\Kriteria::with('subkriteria')
+                ->orderBy('kode_kriteria')
+                ->get();
 
+            // Untuk setiap kriteria, ambil pertanyaan dari semua alternatif
+            $kriterias->each(function ($kriteria) {
+                $kriteria->pertanyaans = Pertanyaan::with('alternatif')
+                    ->where('id_kriteria', $kriteria->id_kriteria)
+                    ->orderBy('id_alternatif')
+                    ->get();
+            });
+
+            // Total pertanyaan & pertanyaan terjawab
+            $totalPertanyaan = Pertanyaan::count();
+            $answeredCount = Penilaian::where('id_user', $targetUserId)->count();
+            $progressPersen = $totalPertanyaan > 0
+                ? round(($answeredCount / $totalPertanyaan) * 100)
+                : 0;
+
+            // existingPenilaians: [id_pertanyaan => id_subkriteria]
             $existingPenilaians = Penilaian::where('id_user', $targetUserId)
                 ->pluck('id_subkriteria', 'id_pertanyaan')
                 ->toArray();
 
-            return view('penilaian.siswa_index', compact('alternatifs', 'existingPenilaians'));
+            return view('penilaian.siswa_index', compact(
+                'kriterias', 'existingPenilaians',
+                'totalPertanyaan', 'answeredCount', 'progressPersen'
+            ));
         }
 
         // 2. Logika untuk Guru BK: Dropdown Siswa & Accordion View
@@ -105,6 +120,7 @@ class PenilaianController extends Controller
     /**
      * Simpan penilaian ke database.
      * Support single alternative (Guru) OR batch upload (Siswa).
+     * Support partial save (_partial=1 redirects back, else final redirect).
      */
     public function store(Request $request)
     {
@@ -112,7 +128,7 @@ class PenilaianController extends Controller
             'jawaban' => 'required|array',  // Format: [id_pertanyaan => id_subkriteria]
             'jawaban.*' => 'exists:subkriteria,id_subkriteria',
             // Optional: id_user target (jika Guru BK menilai atas nama siswa)
-            'id_user' => 'nullable|exists:users,id_user'
+            'id_user' => 'nullable|exists:users,id_user',
         ]);
 
         $currentUser = Auth::user();
@@ -151,10 +167,18 @@ class PenilaianController extends Controller
             DB::commit();
 
             if ($currentUser->role === 'Siswa') {
-                return redirect()->route('perangkingan.index')->with('success', 'Penilaian berhasil disimpan.');
+                // Partial save: kembali ke penilaian, jangan redirect ke perangkingan
+                if ($request->has('_partial')) {
+                    return redirect()->route('penilaian.index')
+                        ->with('success', 'Jawaban tersimpan. Lanjutkan mengisi ya.');
+                }
+                // Final save: redirect ke hasil rekomendasi
+                return redirect()->route('perangkingan.index')
+                    ->with('success', 'Penilaian selesai! Lihat hasil rekomendasi kamu.');
             } else {
                 // Guru BK stay on page (maintain query string)
-                return redirect()->route('penilaian.index', ['id_user' => $targetUserId])->with('success', 'Penilaian berhasil disimpan.');
+                return redirect()->route('penilaian.index', ['id_user' => $targetUserId])
+                    ->with('success', 'Penilaian berhasil disimpan.');
             }
 
         } catch (\Exception $e) {
