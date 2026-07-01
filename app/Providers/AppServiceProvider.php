@@ -2,21 +2,17 @@
 
 namespace App\Providers;
 
+use App\Models\Penilaian;
+use App\Observers\PenilaianObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
@@ -33,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::define('access-master-data', function ($user) {
             return $user->role === 'Guru BK';
         });
+
+        // Observer: auto-kirim email ke Guru BK saat siswa submit penilaian
+        Penilaian::observe(PenilaianObserver::class);
     }
 }

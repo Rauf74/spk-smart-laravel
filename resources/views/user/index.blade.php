@@ -66,7 +66,7 @@
                                 <td>{{ $user->jenis_kelamin ?? '-' }}</td>
                                 <td>
                                     <button class="btn btn-sm btn-warning"
-                                        onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
+                                        onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->email ?? '' }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
                                         <i class="ti ti-edit"></i> Ubah
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger"
@@ -106,6 +106,11 @@
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email <small class="text-muted">(untuk notifikasi)</small></label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="contoh@email.com">
                             </div>
 
                             <div class="mb-3">
@@ -169,12 +174,13 @@
             document.getElementById('jenis_kelamin').value = '';
         }
 
-        function editUser(id, nama, username, role, nis, jenisKelamin) {
+        function editUser(id, nama, username, email, role, nis, jenisKelamin) {
             document.getElementById('modalTitle').innerText = 'Ubah User';
             document.getElementById('userForm').action = '/user/' + id;
             document.getElementById('formMethod').value = 'PUT';
             document.getElementById('nama_user').value = nama;
             document.getElementById('username').value = username;
+            document.getElementById('email').value = email || '';
             document.getElementById('password').value = '';
             document.getElementById('role').value = role;
             document.getElementById('nis').value = nis;

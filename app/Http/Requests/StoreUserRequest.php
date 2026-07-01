@@ -24,6 +24,7 @@ class StoreUserRequest extends FormRequest
         return [
             'nama_user' => 'required|string|max:100',
             'username'  => 'required|string|max:50|unique:users,username',
+            'email'     => 'nullable|email|max:100',
             'password'  => 'required|string|min:6',
             'role'      => 'required|in:Guru BK,Siswa',
             'nis'       => 'nullable|numeric|unique:users,nis',
