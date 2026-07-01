@@ -99,15 +99,22 @@
                                 </div>
                             </form>
 
-                            {{-- Hapus Button (Separate Form) --}}
+                            {{-- Hapus Button (SweetAlert Confirmation) --}}
                             @if($hasData)
-                                <form action="{{ route('penilaian.destroyPerAlternatif') }}" method="POST" class="mt-3 text-end border-top pt-3" >`
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="id_user" value="{{ $targetUserId }}">
-                                    <input type="hidden" name="id_alternatif" value="{{ $alternatif->id_alternatif }}">
-                                    <button type="submit" class="btn btn-danger">Hapus Penilaian</button>
-                                </form>
+                                <div class="mt-3 text-end border-top pt-3">
+                                    <button type="button" class="btn btn-danger"
+                                        onclick="confirmDelete(
+                                            'Hapus Penilaian?',
+                                            '<div class=\'text-start\'>Semua penilaian untuk siswa ini pada program studi <strong>{{ $alternatif->nama_alternatif }}</strong> akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Tidak dapat dibatalkan.</small></div>',
+                                            '{{ route('penilaian.destroyPerAlternatif') }}',
+                                            [
+                                                {name: 'id_user', value: '{{ $targetUserId }}'},
+                                                {name: 'id_alternatif', value: '{{ $alternatif->id_alternatif }}'}
+                                            ]
+                                        )">
+                                        <i class='ti ti-trash me-1'></i>Hapus Penilaian
+                                    </button>
+                                </div>
                             @endif
                         </div>
                     </div>

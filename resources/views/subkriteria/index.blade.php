@@ -56,14 +56,14 @@
                                                     onclick="editSubkriteria({{ $sub->id_subkriteria }}, {{ $sub->id_kriteria }}, '{{ $sub->nama_subkriteria }}', '{{ $sub->nilai }}')">
                                                     Edit
                                                 </button>
-                                                <form action="{{ route('subkriteria.destroy', $sub->id_subkriteria) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Hapus
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="confirmDelete(
+                                                        'Hapus Pilihan Jawaban?',
+                                                        '<div class=\'text-start\'>Pilihan <strong>{{ $sub->nama_subkriteria }}</strong> (nilai: {{ $sub->nilai }}) akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Penilaian siswa yang menggunakan pilihan ini akan terpengaruh.</small></div>',
+                                                        '{{ route('subkriteria.destroy', $sub->id_subkriteria) }}'
+                                                    )">
+                                                    Hapus
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach

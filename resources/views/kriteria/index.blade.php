@@ -106,14 +106,14 @@
                                         onclick="editKriteria({{ $kriteria->id_kriteria }}, '{{ $kriteria->kode_kriteria }}', '{{ $kriteria->nama_kriteria }}', '{{ $kriteria->jenis }}', '{{ $kriteria->bobot }}')">
                                         <i class="ti ti-edit"></i> Ubah
                                     </button>
-                                    <form action="{{ route('kriteria.destroy', $kriteria->id_kriteria) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="ti ti-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmDelete(
+                                            'Hapus Kriteria?',
+                                            '<div class=\'text-start\'>Kriteria <strong>{{ $kriteria->kode_kriteria }} - {{ $kriteria->nama_kriteria }}</strong> akan dihapus permanen.<br><br>Bobot: <strong>{{ $kriteria->bobot }}%</strong><br>Jenis: <span class=\'badge bg-info\'>{{ $kriteria->jenis }}</span><br><br><small class=\'text-danger\'>⚠️ Subkriteria terkait akan ikut terhapus (cascade).</small></div>',
+                                            '{{ route('kriteria.destroy', $kriteria->id_kriteria) }}'
+                                        )">
+                                        <i class="ti ti-trash"></i> Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach

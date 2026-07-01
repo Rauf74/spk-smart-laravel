@@ -58,14 +58,14 @@
                                                     onclick="editPertanyaan({{ $pertanyaan->id_pertanyaan }}, {{ $pertanyaan->id_kriteria }}, {{ $alternatif->id_alternatif }}, `{{ addslashes($pertanyaan->teks_pertanyaan) }}`)">
                                                     Edit
                                                 </button>
-                                                <form action="{{ route('pertanyaan.destroy', $pertanyaan->id_pertanyaan) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Hapus
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="confirmDelete(
+                                                        'Hapus Pertanyaan?',
+                                                        '<div class=\'text-start\'>Pertanyaan:<br><em>{{ addslashes($pertanyaan->teks_pertanyaan) }}</em><br><br>akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Penilaian siswa untuk pertanyaan ini akan ikut terhapus.</small></div>',
+                                                        '{{ route('pertanyaan.destroy', $pertanyaan->id_pertanyaan) }}'
+                                                    )">
+                                                    Hapus
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach

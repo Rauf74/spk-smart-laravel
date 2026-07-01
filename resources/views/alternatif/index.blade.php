@@ -51,14 +51,14 @@
                                         onclick="editAlternatif({{ $alternatif->id_alternatif }}, '{{ $alternatif->kode_alternatif }}', '{{ $alternatif->nama_alternatif }}')">
                                         <i class="ti ti-edit"></i> Ubah
                                     </button>
-                                    <form action="{{ route('alternatif.destroy', $alternatif->id_alternatif) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="ti ti-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmDelete(
+                                            'Hapus Program Studi?',
+                                            '<div class=\'text-start\'>Program studi <strong>{{ $alternatif->kode_alternatif }} - {{ $alternatif->nama_alternatif }}</strong> akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Pertanyaan dan penilaian terkait akan ikut terhapus.</small></div>',
+                                            '{{ route('alternatif.destroy', $alternatif->id_alternatif) }}'
+                                        )">
+                                        <i class="ti ti-trash"></i> Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach

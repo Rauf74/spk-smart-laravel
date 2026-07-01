@@ -69,13 +69,14 @@
                                         onclick="editUser({{ $user->id_user }}, '{{ $user->nama_user }}', '{{ $user->username }}', '{{ $user->role }}', '{{ $user->nis }}', '{{ $user->jenis_kelamin }}')">
                                         <i class="ti ti-edit"></i> Ubah
                                     </button>
-                                    <form action="{{ route('user.destroy', $user->id_user) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="ti ti-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmDelete(
+                                            'Hapus User?',
+                                            '<div class=\'text-start\'>User <strong>{{ $user->nama_user }}</strong> ({{ $user->username }}) akan dihapus permanen.<br><br>Role: <span class=\'badge bg-secondary\'>{{ $user->role }}</span><br>Tindakan ini tidak dapat dibatalkan.</div>',
+                                            '{{ route('user.destroy', $user->id_user) }}'
+                                        )">
+                                        <i class="ti ti-trash"></i> Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach

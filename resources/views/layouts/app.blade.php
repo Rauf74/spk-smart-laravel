@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard - SPK SMART')</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/smk3.png') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
@@ -161,6 +162,59 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        // Global confirmDelete() — panggil dari tombol dengan data attributes
+        // Contoh 1 (simple): onclick="confirmDelete('Hapus User?', 'User Andi akan dihapus', '/user/5')"
+        // Contoh 2 (extra fields): onclick="confirmDelete('Hapus?', '...', '/penilaian', [{name:'id_user', value:5}, {name:'id_alternatif', value:3}])"
+        function confirmDelete(title, preview, action, extraFields = []) {
+            Swal.fire({
+                title: title,
+                html: preview,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FA896B',
+                cancelButtonColor: '#5A6A85',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Buat form dinamis untuk DELETE request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = action;
+                    form.style.display = 'none';
+
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = '_token';
+                    csrf.value = document.querySelector('meta[name="csrf-token"]')?.content
+                              || document.querySelector('input[name="_token"]')?.value;
+                    form.appendChild(csrf);
+
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'DELETE';
+                    form.appendChild(method);
+
+                    // Tambahkan field ekstra jika ada
+                    extraFields.forEach(field => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = field.name;
+                        input.value = field.value;
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
     </script>
 
     @stack('scripts')
