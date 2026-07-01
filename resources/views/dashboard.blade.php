@@ -152,6 +152,114 @@
 
     {{-- STATUS SISWA (Guru BK Only) --}}
     @if(Auth::user()->role === 'Guru BK')
+        {{-- ============================================ --}}
+        {{-- STATISTIK AGREGAT (B1)                       --}}
+        {{-- ============================================ --}}
+        <div class="row mb-4">
+            {{-- Progress Rata-rata --}}
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <small class="text-muted text-uppercase fw-semibold">Progress Rata-rata</small>
+                        <h2 class="fw-bold mb-1 mt-1">{{ $avgProgressPercent }}%</h2>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar bg-primary" style="width:{{ $avgProgressPercent }}%"></div>
+                        </div>
+                        <small class="text-muted">Total siswa: {{ $total_siswa }}</small>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Top Rekomendasi --}}
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <small class="text-muted text-uppercase fw-semibold">Top Rekomendasi</small>
+                        @if($topRekomendasi)
+                            <h5 class="fw-bold mb-1 mt-1 text-truncate" title="{{ $topRekomendasi }}">
+                                <i class="ti ti-trophy text-warning me-1"></i>{{ $topRekomendasi }}
+                            </h5>
+                            <small class="text-muted">Paling banyak dipilih siswa</small>
+                        @else
+                            <h5 class="fw-bold mb-1 mt-1 text-muted">-</h5>
+                            <small class="text-muted">Belum ada siswa yang menyelesaikan kuesioner</small>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Kriteria Terbesar --}}
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <small class="text-muted text-uppercase fw-semibold">Kriteria Terbesar</small>
+                        @if($topKriterias->isNotEmpty())
+                            @php $top1 = $topKriterias->first(); @endphp
+                            <h5 class="fw-bold mb-1 mt-1 text-truncate" title="{{ $top1->nama_kriteria }}">
+                                {{ $top1->kode_kriteria }}
+                            </h5>
+                            <small class="text-muted">{{ $top1->bobot }}% bobot</small>
+                        @else
+                            <h5 class="fw-bold mb-1 mt-1 text-muted">-</h5>
+                            <small class="text-muted">Belum ada kriteria</small>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Aktivitas 7 Hari --}}
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <small class="text-muted text-uppercase fw-semibold">Aktivitas 7 Hari</small>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div class="text-center flex-grow-1">
+                                <div class="fw-bold fs-5">{{ $activities7d['user_baru'] }}</div>
+                                <small class="text-muted d-block">User</small>
+                            </div>
+                            <div class="text-center flex-grow-1">
+                                <div class="fw-bold fs-5">{{ $activities7d['penilaian_baru'] }}</div>
+                                <small class="text-muted d-block">Nilai</small>
+                            </div>
+                            <div class="text-center flex-grow-1">
+                                <div class="fw-bold fs-5">{{ $activities7d['kriteria_baru'] + $activities7d['alternatif_baru'] }}</div>
+                                <small class="text-muted d-block">Data</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Distribusi Rekomendasi --}}
+        @if($rekomendasiDistribusi->isNotEmpty())
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-semibold mb-3">
+                                <i class="ti ti-chart-pie me-2 text-primary"></i>Distribusi Rekomendasi Program Studi
+                            </h5>
+                            <p class="text-muted small mb-3">Siswa yang sudah menyelesaikan kuesioner dan mendapat rekomendasi program studi.</p>
+                            <div class="row g-3">
+                                @foreach($rekomendasiDistribusi as $namaProdi => $jumlahSiswa)
+                                    <div class="col-md-3 col-6">
+                                        <div class="d-flex align-items-center p-3 rounded-3 bg-light">
+                                            <i class="ti ti-school text-primary fs-3 me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold text-truncate" style="max-width:150px;" title="{{ $namaProdi }}">{{ $namaProdi }}</div>
+                                                <small class="text-muted">{{ $jumlahSiswa }} siswa</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card">

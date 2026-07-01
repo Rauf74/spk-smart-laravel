@@ -131,6 +131,58 @@ class DashboardController extends Controller
         }
 
         // ==============================================
+        // STATISTIK AGREGAT (B1)
+        // ==============================================
+
+        // Persentase progress rata-rata siswa
+        $totalJawabanAllSiswa = $allSiswaStatus->sum('jawaban_count');
+        $maxJawaban = $totalSiswa * max($totalPertanyaan, 1);
+        $avgProgressPercent = $maxJawaban > 0
+            ? round(($totalJawabanAllSiswa / $maxJawaban) * 100)
+            : 0;
+
+        // Kriteria dengan bobot tertinggi (top 3)
+        $topKriterias = Kriteria::orderBy('bobot', 'desc')->limit(3)->get();
+
+        // Distribusi rekomendasi program studi (jika ada hasil perangkingan)
+        $rekomendasiDistribusi = collect();
+        $topRekomendasi = null;
+        $avgNilaiAkhir = 0;
+
+        $siswaSelesaiIds = $allSiswaStatus->where('status', 'selesai')->pluck('id_user');
+        if ($siswaSelesaiIds->isNotEmpty() && $totalPertanyaan > 0) {
+            // Untuk setiap siswa yang sudah selesai, hitung top 1 alternatif
+            $distribusiRaw = DB::table('users as u')
+                ->join('penilaian as p', 'u.id_user', '=', 'p.id_user')
+                ->join('alternatif as a', 'p.id_alternatif', '=', 'a.id_alternatif')
+                ->where('u.role', 'Siswa')
+                ->whereIn('u.id_user', $siswaSelesaiIds)
+                ->groupBy('u.id_user', 'a.id_alternatif', 'a.nama_alternatif')
+                ->selectRaw('u.id_user, a.id_alternatif, a.nama_alternatif, COUNT(*) as vote')
+                ->get()
+                ->groupBy('id_user')
+                ->map(function ($votes) {
+                    return $votes->sortByDesc('vote')->first();
+                })
+                ->groupBy('nama_alternatif')
+                ->map->count();
+
+            $rekomendasiDistribusi = $distribusiRaw->sortDesc();
+
+            if ($rekomendasiDistribusi->isNotEmpty()) {
+                $topRekomendasi = $rekomendasiDistribusi->keys()->first();
+            }
+        }
+
+        // Aktivitas 7 hari terakhir
+        $activities7d = [
+            'user_baru'      => User::where('created_at', '>=', now()->subDays(7))->count(),
+            'kriteria_baru'  => Kriteria::where('created_at', '>=', now()->subDays(7))->count(),
+            'alternatif_baru' => Alternatif::where('created_at', '>=', now()->subDays(7))->count(),
+            'penilaian_baru' => Penilaian::where('created_at', '>=', now()->subDays(7))->distinct('id_user')->count('id_user'),
+        ];
+
+        // ==============================================
         // DATA UNTUK GRAFIK
         // ==============================================
 
@@ -186,6 +238,11 @@ class DashboardController extends Controller
             'total_pertanyaan' => $totalPertanyaan,
             'search' => $search,
             'statusFilter' => $statusFilter,
+            'avgProgressPercent' => $avgProgressPercent,
+            'topKriterias' => $topKriterias,
+            'rekomendasiDistribusi' => $rekomendasiDistribusi,
+            'topRekomendasi' => $topRekomendasi,
+            'activities7d' => $activities7d,
         ]);
     }
 
