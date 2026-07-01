@@ -8,6 +8,35 @@
     <title>@yield('title', 'Dashboard - SPK SMART')</title>
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/smk3.png') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <style>
+        /* Skeleton/Loading Shimmer */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-line { height: 12px; margin: 8px 0; }
+        .skeleton-line-sm { height: 8px; margin: 4px 0; }
+        .skeleton-line-lg { height: 20px; margin: 8px 0; }
+        .skeleton-block { min-height: 100px; }
+        .skeleton-circle { width: 40px; height: 40px; border-radius: 50%; display: inline-block; }
+        /* Empty state illustration */
+        .empty-state-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            color: #5D87FF;
+            font-size: 36px;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.36.0/tabler-icons.min.css">
     <style>
         /* Make all DataTables headers center aligned */
@@ -46,7 +75,43 @@
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js"></script>
+
+    <!-- Page Loader (shown during navigation) -->
+    <div id="pageLoader" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.85);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status" style="width:3rem;height:3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="text-muted small">Memuat...</div>
+        </div>
+    </div>
+
+    <script>
+        // Tampilkan page loader saat navigasi (klik link internal) atau saat halaman unload
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href^="/"], a[href^="./"], a[href^="../"]').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    // Skip jika external, target=_blank, hash, atau javascript:
+                    var href = this.getAttribute('href');
+                    if (!href || href.startsWith('#') || href.startsWith('javascript:') ||
+                        this.target === '_blank' || this.hasAttribute('data-no-loader') ||
+                        href.includes('export') || href.includes('pdf')) {
+                        return;
+                    }
+                    // Tampilkan loader setelah delay kecil biar tidak flicker
+                    setTimeout(function() {
+                        document.getElementById('pageLoader').style.display = 'flex';
+                    }, 100);
+                });
+            });
+
+            // Hide loader saat halaman selesai load
+            window.addEventListener('pageshow', function() {
+                document.getElementById('pageLoader').style.display = 'none';
+            });
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         @if(session('login_success'))
