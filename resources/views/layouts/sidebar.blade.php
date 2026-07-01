@@ -104,6 +104,13 @@
                             <span class="hide-menu">Data Pengguna</span>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link {{ request()->routeIs('audit.index') ? 'active' : '' }}"
+                            href="{{ route('audit.index') }}" aria-expanded="false">
+                            <span><i class="ti ti-history"></i></span>
+                            <span class="hide-menu">Audit Log</span>
+                        </a>
+                    </li>
 
                     {{-- Menu Siswa --}}
                 @elseif(Auth::user()->role === 'Siswa')

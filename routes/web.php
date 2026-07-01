@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('penilaian/destroyPerAlternatif', [PenilaianController::class, 'destroyPerAlternatif'])->name('penilaian.destroyPerAlternatif');
     Route::get('penilaian/export', [PenilaianExportController::class, 'download'])->name('penilaian.export');
     Route::get('penilaian/rekap-kelas', [PenilaianExportController::class, 'rekapPerKelas'])->name('penilaian.rekap-kelas');
+    Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit.index');
     Route::resource('penilaian', PenilaianController::class)->only(['index', 'store', 'edit']);
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');

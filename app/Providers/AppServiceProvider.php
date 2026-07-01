@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Penilaian;
+use App\Observers\AuditObserver;
 use App\Observers\PenilaianObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,5 +33,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Observer: auto-kirim email ke Guru BK saat siswa submit penilaian
         Penilaian::observe(PenilaianObserver::class);
+
+        // Observer: audit log untuk model-model master
+        $auditObserver = new AuditObserver();
+        foreach (AuditObserver::auditableModels() as $modelClass) {
+            $modelClass::observe($auditObserver);
+        }
     }
 }
