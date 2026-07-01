@@ -117,23 +117,52 @@
                 }
             });
 
-            // Flash Messages via SweetAlert2
+            // Flash Messages via SweetAlert2 Toast (kecil di pojok, auto-hide)
             @if(session('success'))
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil!',
-                    text: {!! json_encode(session('success')) !!},
-                    timer: 1500,
-                    showConfirmButton: false
+                    title: '{{ session('success') }}',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
                 });
             @endif
 
             @if(session('error'))
                 Swal.fire({
                     icon: 'error',
-                    title: 'Gagal!',
-                    text: {!! json_encode(session('error')) !!},
-                    showConfirmButton: true
+                    title: '{{ session('error') }}',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                });
+            @endif
+
+            @if(session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: '{{ session('warning') }}',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                });
+            @endif
+
+            @if(session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: '{{ session('info') }}',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
                 });
             @endif
 
