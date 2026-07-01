@@ -110,6 +110,59 @@
                 document.getElementById('pageLoader').style.display = 'none';
             });
         });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Skip jika user sedang mengetik di input/textarea (kecuali Escape)
+            var tag = (e.target.tagName || '').toLowerCase();
+            var isTyping = ['input', 'textarea', 'select'].includes(tag) && e.key !== 'Escape';
+
+            // Escape: tutup modal, drawer, atau focus ke body
+            if (e.key === 'Escape') {
+                // Bootstrap modal
+                var openModal = document.querySelector('.modal.show');
+                if (openModal && window.bootstrap) {
+                    var modal = window.bootstrap.Modal.getInstance(openModal);
+                    if (modal) modal.hide();
+                    return;
+                }
+                // SweetAlert
+                if (window.Swal && Swal.isVisible()) {
+                    Swal.close();
+                    return;
+                }
+            }
+
+            if (isTyping) return;
+
+            // Ctrl/Cmd + P: langsung print (skip browser default dialog kalau ada target)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                // Biarkan browser default handle, kecuali ada class .auto-print di body
+                if (document.body.classList.contains('auto-print')) {
+                    e.preventDefault();
+                    window.print();
+                }
+            }
+
+            // Ctrl/Cmd + S: simpan wizard (form id #formKuesioner)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                var form = document.getElementById('formKuesioner');
+                if (form) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }
+            }
+
+            // Ctrl/Cmd + K: fokus ke search input (kalau ada)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                var search = document.querySelector('input[name="q"], input[type="search"]');
+                if (search) {
+                    e.preventDefault();
+                    search.focus();
+                    search.select();
+                }
+            }
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
