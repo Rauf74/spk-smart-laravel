@@ -396,9 +396,13 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4 text-muted">
-                                                <i class="ti ti-users fs-3 mb-2 d-block"></i>
-                                                Belum ada data siswa
+                                            <td colspan="6" class="p-0">
+                                                <x-empty-state
+                                                    icon="ti ti-users"
+                                                    title="Belum ada data siswa"
+                                                    message="Tambahkan siswa melalui menu Data Pengguna."
+                                                    :action-url="route('user.index')"
+                                                    action-label="Kelola User" />
                                             </td>
                                         </tr>
                                     @endforelse

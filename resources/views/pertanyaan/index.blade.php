@@ -71,7 +71,12 @@
                                     @endforeach
                                     @if($alternatif->pertanyaan->isEmpty())
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted">Belum ada pertanyaan</td>
+                                            <td colspan="4" class="p-0">
+                                                <x-empty-state
+                                                    icon="ti ti-help"
+                                                    title="Belum ada pertanyaan"
+                                                    :message="'Tambahkan pertanyaan untuk ' . $alternatif->nama_alternatif" />
+                                            </td>
                                         </tr>
                                     @endif
                                 </tbody>

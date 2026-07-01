@@ -69,7 +69,12 @@
                                     @endforeach
                                     @if($kriteria->subkriteria->isEmpty())
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted">Belum ada data subkriteria</td>
+                                            <td colspan="4" class="p-0">
+                                                <x-empty-state
+                                                    icon="ti ti-list"
+                                                    title="Belum ada pilihan jawaban"
+                                                    :message="'Tambahkan pilihan untuk kriteria ' . $kriteria->nama_kriteria" />
+                                            </td>
                                         </tr>
                                     @endif
                                 </tbody>

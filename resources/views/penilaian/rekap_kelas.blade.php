@@ -20,9 +20,10 @@
     </div>
 
     @if($rekapKelas->isEmpty())
-        <div class="alert alert-info">
-            <i class="ti ti-info-circle me-2"></i>Belum ada data siswa dengan NIS yang valid.
-        </div>
+        <x-empty-state
+            icon="ti ti-school-off"
+            title="Belum ada data kelas"
+            message="Tambahkan siswa dengan NIS yang valid untuk melihat rekap per kelas." />
     @else
         <div class="row g-3">
             @foreach($rekapKelas as $rekap)
