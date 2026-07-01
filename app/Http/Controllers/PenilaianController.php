@@ -10,6 +10,7 @@ use App\Models\Pertanyaan;
 use App\Models\Penilaian;
 use App\Models\Subkriteria;
 use App\Models\User;
+use App\Http\Requests\StorePenilaianBatchRequest;
 
 /**
  * Controller untuk mengelola Penilaian.
@@ -144,15 +145,8 @@ class PenilaianController extends Controller
      * Support single alternative (Guru) OR batch upload (Siswa).
      * Support partial save (_partial=1 redirects back, else final redirect).
      */
-    public function store(Request $request)
+    public function store(StorePenilaianBatchRequest $request)
     {
-        $request->validate([
-            'jawaban' => 'required|array',  // Format: [id_pertanyaan => id_subkriteria]
-            'jawaban.*' => 'exists:subkriteria,id_subkriteria',
-            // Optional: id_user target (jika Guru BK menilai atas nama siswa)
-            'id_user' => 'nullable|exists:users,id_user',
-        ]);
-
         $currentUser = Auth::user();
 
         // Tentukan user target: jika Guru BK submit & ada id_user, pakai itu. Jika Siswa, pakai Auth::id().

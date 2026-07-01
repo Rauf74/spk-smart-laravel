@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kriteria;
+use App\Http\Requests\StoreKriteriaRequest;
+use App\Http\Requests\UpdateKriteriaRequest;
 
 /**
  * Controller untuk mengelola data Kriteria.
@@ -45,16 +47,8 @@ class KriteriaController extends Controller
      * - Jenis harus Benefit atau Cost
      * - Bobot 0-100, dan total semua bobot tidak boleh lebih dari 100%
      */
-    public function store(Request $request)
+    public function store(StoreKriteriaRequest $request)
     {
-        // Validasi input dasar
-        $request->validate([
-            'kode_kriteria' => 'required|unique:kriteria,kode_kriteria|max:10',
-            'nama_kriteria' => 'required|unique:kriteria,nama_kriteria|max:100',
-            'jenis' => 'required|in:Benefit,Cost',
-            'bobot' => 'required|numeric|min:0|max:100',
-        ]);
-
         // Cek apakah total bobot tidak melebihi 100%
         $totalBobotSaatIni = Kriteria::sum('bobot');
         $bobotBaru = $request->bobot;
@@ -95,17 +89,9 @@ class KriteriaController extends Controller
      * 
      * Sama seperti store, tapi perlu exclude bobot lama saat validasi total.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateKriteriaRequest $request, string $id)
     {
         $kriteria = Kriteria::findOrFail($id);
-
-        // Validasi input (dengan pengecualian untuk unique check)
-        $request->validate([
-            'kode_kriteria' => 'required|max:10|unique:kriteria,kode_kriteria,' . $id . ',id_kriteria',
-            'nama_kriteria' => 'required|max:100|unique:kriteria,nama_kriteria,' . $id . ',id_kriteria',
-            'jenis' => 'required|in:Benefit,Cost',
-            'bobot' => 'required|numeric|min:0|max:100',
-        ]);
 
         // Hitung total bobot (tanpa bobot kriteria yang sedang diedit)
         $totalBobotLain = Kriteria::sum('bobot') - $kriteria->bobot;
@@ -117,8 +103,7 @@ class KriteriaController extends Controller
                 ->withInput();
         }
 
-        // Update database
-        $kriteria->update($request->all());
+        $kriteria->update($request->validated());
 
         return redirect()
             ->route('kriteria.index')

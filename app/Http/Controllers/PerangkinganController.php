@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\SmartCalculationService;
 use App\Models\CatatanKonseling;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Requests\StoreCatatanRequest;
 
 /**
  * Controller untuk halaman Perangkingan.
@@ -89,13 +90,8 @@ class PerangkinganController extends Controller
     /**
      * Simpan atau update catatan konseling Guru BK untuk siswa.
      */
-    public function storeCatatan(Request $request)
+    public function storeCatatan(StoreCatatanRequest $request)
     {
-        $request->validate([
-            'id_user' => 'required|exists:users,id_user',
-            'catatan' => 'required|string|max:2000',
-        ]);
-
         $guruId = Auth::user()->id_user;
 
         CatatanKonseling::updateOrCreate(

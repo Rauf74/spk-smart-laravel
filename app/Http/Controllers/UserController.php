@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 /**
  * Controller untuk mengelola data User.
@@ -37,23 +39,12 @@ class UserController extends Controller
      * 
      * Password akan di-hash secara otomatis sebelum disimpan.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        // Validasi input
-        $request->validate([
-            'nama_user' => 'required|max:100',
-            'username' => 'required|max:50|unique:users,username',
-            'password' => 'required|min:6',
-            'role' => 'required|in:Guru BK,Siswa',
-            'nis' => 'nullable|numeric|unique:users,nis',
-        ]);
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+        $data['is_logged_in'] = false;
 
-        // Siapkan data untuk disimpan
-        $data = $request->all();
-        $data['password'] = Hash::make($request->password);  // Hash password
-        $data['is_logged_in'] = false;  // Default: belum login
-
-        // Simpan ke database
         User::create($data);
 
         return redirect()
@@ -83,34 +74,18 @@ class UserController extends Controller
      * 
      * Password hanya diupdate jika diisi (tidak wajib saat edit).
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
         $user = User::findOrFail($id);
+        $data = $request->validated();
 
-        // Aturan validasi dasar
-        $rules = [
-            'nama_user' => 'required|max:100',
-            'username' => 'required|max:50|unique:users,username,' . $id . ',id_user',
-            'role' => 'required|in:Guru BK,Siswa',
-            'nis' => 'nullable|numeric|unique:users,nis,' . $id . ',id_user',
-        ];
-
-        // Password opsional saat edit
-        if ($request->filled('password')) {
-            $rules['password'] = 'min:6';
+        // Hash password jika diisi, hapus jika tidak
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
         }
 
-        $request->validate($rules);
-
-        // Siapkan data (tanpa password dulu)
-        $data = $request->except(['password']);
-
-        // Hash password jika diisi
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        // Update database
         $user->update($data);
 
         return redirect()
