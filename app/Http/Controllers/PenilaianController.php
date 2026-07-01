@@ -84,7 +84,29 @@ class PenilaianController extends Controller
 
         // 2. Logika untuk Guru BK: Dropdown Siswa & Accordion View
         if ($currentUser->role === 'Guru BK') {
-            $users = User::where('role', 'Siswa')->get();
+            // Filter kelas (prefix NIS)
+            $kelasFilter = trim((string) $request->query('kelas', ''));
+            $kelasFilter = $kelasFilter !== '' ? substr(preg_replace('/[^0-9]/', '', $kelasFilter), 0, 5) : '';
+
+            // Query siswa, terapkan filter kelas jika ada
+            $usersQuery = User::where('role', 'Siswa')
+                ->when($kelasFilter !== '', fn($q) => $q->where('nis', 'LIKE', $kelasFilter . '%'))
+                ->orderBy('nama_user');
+
+            $users = $usersQuery->get();
+
+            // Daftar kelas unik (2 digit pertama NIS), diurutkan
+            $kelasList = User::where('role', 'Siswa')
+                ->whereNotNull('nis')
+                ->where('nis', '!=', '')
+                ->pluck('nis')
+                ->map(fn($nis) => substr(preg_replace('/[^0-9]/', '', (string) $nis), 0, 2))
+                ->filter(fn($k) => strlen($k) === 2)
+                ->unique()
+                ->sort()
+                ->values()
+                ->toArray();
+
             $targetUserId = $request->id_user; // Bisa null jika belum pilih
 
             $alternatifs = [];
@@ -92,11 +114,10 @@ class PenilaianController extends Controller
 
             if ($targetUserId) {
                 $alternatifs = Alternatif::with(['pertanyaan.kriteria.subkriteria'])->get();
-                // Kita ambil full collection untuk diproses di view (grouping by pertanyaan/alternatif)
                 $existingPenilaians = Penilaian::where('id_user', $targetUserId)->get();
             }
 
-            return view('penilaian.guru_index', compact('users', 'targetUserId', 'alternatifs', 'existingPenilaians'));
+            return view('penilaian.guru_index', compact('users', 'targetUserId', 'alternatifs', 'existingPenilaians', 'kelasList', 'kelasFilter'));
         }
 
         // Fallback default

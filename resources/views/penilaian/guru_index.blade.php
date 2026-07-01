@@ -9,20 +9,23 @@
             <h1 class="mb-1">Penilaian Siswa</h1>
             <p class="fs-6 mb-0">Menampilkan rekapitulasi jawaban kuesioner dari setiap siswa, lengkap dengan ringkasan nilai per kriteria.</p>
         </div>
-        <a href="{{ route('penilaian.export') }}" class="btn btn-success">
-            <i class="ti ti-file-spreadsheet me-1"></i>Export ke Excel
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('penilaian.rekap-kelas') }}" class="btn btn-outline-primary">
+                <i class="ti ti-chart-bar me-1"></i>Rekap Kelas
+            </a>
+            <a href="{{ route('penilaian.export') }}" class="btn btn-success">
+                <i class="ti ti-file-spreadsheet me-1"></i>Export ke Excel
+            </a>
+        </div>
     </div>
 
-    {{-- Dropdown Pilih Siswa --}}
+    {{-- Dropdown Pilih Siswa & Filter Kelas --}}
     <div class="card mb-4">
         <div class="card-body">
-            <form action="{{ route('penilaian.index') }}" method="GET" class="row align-items-center">
-                <div class="col-auto">
-                    <label for="id_user" class="col-form-label fw-bold">Pilih Siswa:</label>
-                </div>
-                <div class="col-auto">
-                    <select name="id_user" id="id_user" class="form-select" onchange="this.form.submit()" style="min-width: 250px;">
+            <form action="{{ route('penilaian.index') }}" method="GET" class="row align-items-end g-2">
+                <div class="col-md-4">
+                    <label for="id_user" class="form-label fw-bold mb-1">Pilih Siswa</label>
+                    <select name="id_user" id="id_user" class="form-select" onchange="this.form.submit()">
                         <option value="">-- Pilih Siswa --</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id_user }}" {{ $targetUserId == $user->id_user ? 'selected' : '' }}>
@@ -30,6 +33,34 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="kelas" class="form-label fw-bold mb-1">Filter Kelas</label>
+                    <select name="kelas" id="kelas" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Semua Kelas --</option>
+                        @foreach($kelasList ?? [] as $kls)
+                            <option value="{{ $kls }}" {{ ($kelasFilter ?? '') === $kls ? 'selected' : '' }}>
+                                Kelas {{ $kls }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="ti ti-filter me-1"></i>Filter
+                    </button>
+                </div>
+                @if(($kelasFilter ?? '') !== '' || $targetUserId)
+                    <div class="col-md-2">
+                        <a href="{{ route('penilaian.index') }}" class="btn btn-outline-secondary w-100">
+                            <i class="ti ti-x me-1"></i>Reset
+                        </a>
+                    </div>
+                @endif
+                <div class="col-md-1 text-end">
+                    <a href="{{ route('penilaian.export', ['kelas' => $kelasFilter ?? '']) }}" class="btn btn-success w-100" title="Export ke Excel">
+                        <i class="ti ti-file-spreadsheet"></i>
+                    </a>
                 </div>
             </form>
         </div>

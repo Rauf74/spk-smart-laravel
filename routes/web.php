@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('penilaian/create/{id_alternatif}', [PenilaianController::class, 'create'])->name('penilaian.create');
     Route::delete('penilaian/destroyPerAlternatif', [PenilaianController::class, 'destroyPerAlternatif'])->name('penilaian.destroyPerAlternatif');
     Route::get('penilaian/export', [PenilaianExportController::class, 'download'])->name('penilaian.export');
+    Route::get('penilaian/rekap-kelas', [PenilaianExportController::class, 'rekapPerKelas'])->name('penilaian.rekap-kelas');
     Route::resource('penilaian', PenilaianController::class)->only(['index', 'store', 'edit']);
     Route::get('perhitungan', [PerhitunganController::class, 'index'])->name('perhitungan.index');
     Route::get('perangkingan', [PerangkinganController::class, 'index'])->name('perangkingan.index');
