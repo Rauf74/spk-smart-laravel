@@ -219,7 +219,7 @@
                                 <tbody>
                                     @forelse($siswa_status as $index => $siswa)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $siswa_status->firstItem() + $index }}</td>
                                             <td class="fw-semibold">{{ $siswa->nama_user }}</td>
                                             <td><small class="text-muted">{{ $siswa->username }}</small></td>
                                             <td>
@@ -269,6 +269,17 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        {{-- Pagination --}}
+                        @if($siswa_status->hasPages())
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">
+                                    Menampilkan {{ $siswa_status->firstItem() }} - {{ $siswa_status->lastItem() }}
+                                    dari {{ $siswa_status->total() }} siswa
+                                </small>
+                                {{ $siswa_status->links('pagination::bootstrap-5') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

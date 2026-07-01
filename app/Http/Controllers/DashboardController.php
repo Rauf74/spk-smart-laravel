@@ -41,15 +41,21 @@ class DashboardController extends Controller
         // STATUS SISWA (Guru BK Dashboard)
         // ==============================================
         $totalPertanyaan = \App\Models\Pertanyaan::count();
-        $siswaStatus = User::where('role', 'Siswa')
+
+        // Query dasar untuk status siswa (di-reuse untuk stats + tabel)
+        $siswaQuery = User::where('role', 'Siswa')
             ->leftJoin('penilaian as p', 'users.id_user', '=', 'p.id_user')
             ->selectRaw('
                 users.id_user,
                 users.nama_user,
                 users.username,
+                users.nis,
                 COUNT(DISTINCT p.id_pertanyaan) as jawaban_count
             ')
-            ->groupBy('users.id_user', 'users.nama_user', 'users.username')
+            ->groupBy('users.id_user', 'users.nama_user', 'users.username', 'users.nis');
+
+        // Statistik agregat (semua siswa, tanpa pagination)
+        $allSiswaStatus = (clone $siswaQuery)
             ->orderBy('users.nama_user')
             ->get()
             ->map(function ($siswa) use ($totalPertanyaan) {
@@ -75,9 +81,36 @@ class DashboardController extends Controller
                 return $siswa;
             });
 
-        $belumIsi = $siswaStatus->where('status', 'belum')->count();
-        $sedangIsi = $siswaStatus->where('status', 'sedang')->count();
-        $selesaiIsi = $siswaStatus->where('status', 'selesai')->count();
+        $belumIsi = $allSiswaStatus->where('status', 'belum')->count();
+        $sedangIsi = $allSiswaStatus->where('status', 'sedang')->count();
+        $selesaiIsi = $allSiswaStatus->where('status', 'selesai')->count();
+
+        // Tabel siswa dengan pagination (10 per halaman)
+        $siswaStatusPaginated = (clone $siswaQuery)
+            ->orderBy('users.nama_user')
+            ->paginate(10)
+            ->through(function ($siswa) use ($totalPertanyaan) {
+                $jawaban = $siswa->jawaban_count;
+                if ($jawaban == 0) {
+                    $siswa->status = 'belum';
+                    $siswa->status_label = 'Belum Mengisi';
+                    $siswa->status_class = 'bg-danger';
+                    $siswa->status_icon = 'ti ti-circle-x';
+                } elseif ($jawaban < $totalPertanyaan) {
+                    $siswa->status = 'sedang';
+                    $siswa->status_label = 'Sedang Mengisi';
+                    $siswa->status_class = 'bg-warning';
+                    $siswa->status_icon = 'ti ti-loader';
+                    $siswa->progress = round(($jawaban / $totalPertanyaan) * 100);
+                } else {
+                    $siswa->status = 'selesai';
+                    $siswa->status_label = 'Selesai';
+                    $siswa->status_class = 'bg-success';
+                    $siswa->status_icon = 'ti ti-circle-check';
+                    $siswa->progress = 100;
+                }
+                return $siswa;
+            });
 
         // ==============================================
         // DATA UNTUK GRAFIK
@@ -128,7 +161,7 @@ class DashboardController extends Controller
             'avg_bobot' => $avgBobot,
             'alternatif_terbaru' => $alternatifTerbaru,
             'recent_activities' => $recentActivities,
-            'siswa_status' => $siswaStatus,
+            'siswa_status' => $siswaStatusPaginated,
             'belum_isi' => $belumIsi,
             'sedang_isi' => $sedangIsi,
             'selesai_isi' => $selesaiIsi,
