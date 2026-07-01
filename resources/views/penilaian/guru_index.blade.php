@@ -4,8 +4,15 @@
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-4">Penilaian Siswa</h1>
-    <p class="fs-6 mb-4">Menampilkan rekapitulasi jawaban kuesioner dari setiap siswa, lengkap dengan ringkasan nilai per kriteria.</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h1 class="mb-1">Penilaian Siswa</h1>
+            <p class="fs-6 mb-0">Menampilkan rekapitulasi jawaban kuesioner dari setiap siswa, lengkap dengan ringkasan nilai per kriteria.</p>
+        </div>
+        <a href="{{ route('penilaian.export') }}" class="btn btn-success">
+            <i class="ti ti-file-spreadsheet me-1"></i>Export ke Excel
+        </a>
+    </div>
 
     {{-- Dropdown Pilih Siswa --}}
     <div class="card mb-4">
