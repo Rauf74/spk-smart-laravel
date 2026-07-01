@@ -27,7 +27,7 @@
             <div class="card mb-4 border-0 shadow-sm bg-light-primary">
                 <div class="card-body p-3">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <h6 class="mb-1 fw-bold">
                                 Progres Pengisian
                             </h6>
@@ -35,7 +35,7 @@
                                 {{ $answeredCount }} dari {{ $totalPertanyaan }} pertanyaan terjawab
                             </span>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div class="progress" style="height: 14px;">
                                 <div id="progressBar"
                                      class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
@@ -44,15 +44,21 @@
                                      data-total="{{ $totalPertanyaan }}">
                                 </div>
                             </div>
-                            <div class="text-end mt-1">
+                            <div class="d-flex justify-content-between mt-1">
                                 <small id="progressPersen" class="fw-bold text-muted">{{ $progressPersen }}%</small>
+                                <small id="autosaveStatus" class="text-muted small">
+                                    <i class="ti ti-circle-check text-success me-1"></i>Tersimpan
+                                </small>
                             </div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <a href="{{ route('perangkingan.index') }}" class="btn btn-success btn-sm">
+                                <i class="ti ti-trophy me-1"></i>Lihat Hasil
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {{-- ======== STEPPER NAVIGATION ======== --}}
             <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-body p-3">
                     <nav class="stepper-nav d-flex justify-content-between flex-wrap gap-1" id="stepperNav">
@@ -413,7 +419,11 @@
 
             // Event listeners
             allRadios.forEach(radio => {
-                radio.addEventListener('change', updateAllProgress);
+                radio.addEventListener('change', function() {
+                    updateAllProgress();
+                    // Trigger auto-save
+                    autoSaveJawaban(this);
+                });
             });
 
             // Init
@@ -431,6 +441,81 @@
                     showStep(currentStep - 1);
                 }
             });
+
+            // ========== AUTO-SAVE INDICATOR ==========
+            // Kirim 1 jawaban ke server secara async setiap radio change.
+            // Tidak menggantikan submit form — itu tetap final save.
+            const autosaveStatus = document.getElementById('autosaveStatus');
+            let autosaveDebounce = null;
+            let autosaveLastTime = null;
+
+            function setAutosaveStatus(state, text) {
+                if (!autosaveStatus) return;
+                autosaveStatus.innerHTML = text;
+                autosaveStatus.className = 'text-muted small text-' + state;
+            }
+
+            function formatRelativeTime(date) {
+                if (!date) return '';
+                const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+                if (seconds < 5) return 'baru saja';
+                if (seconds < 60) return seconds + ' detik lalu';
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return minutes + ' menit lalu';
+                const hours = Math.floor(minutes / 60);
+                return hours + ' jam lalu';
+            }
+
+            // Update status timestamp tiap 10 detik
+            setInterval(function() {
+                if (autosaveLastTime) {
+                    setAutosaveStatus('success',
+                        '<i class="ti ti-circle-check text-success me-1"></i>Tersimpan ' + formatRelativeTime(autosaveLastTime));
+                }
+            }, 10000);
+
+            window.autoSaveJawaban = function(radioEl) {
+                // Debounce 500ms: tunggu user selesai pilih
+                clearTimeout(autosaveDebounce);
+                autosaveDebounce = setTimeout(function() {
+                    // Skip kalau tidak ada radio selected
+                    if (!radioEl || !radioEl.value) return;
+
+                    const pertanyaanId = radioEl.name.replace('jawaban[', '').replace(']', '');
+                    const subkriteriaId = radioEl.value;
+
+                    setAutosaveStatus('muted',
+                        '<i class="ti ti-loader me-1"></i>Menyimpan...');
+
+                    // Kirim via fetch (async, tidak block UI)
+                    const formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                    formData.append('jawaban[' + pertanyaanId + ']', subkriteriaId);
+                    formData.append('_partial', '1');
+
+                    fetch('{{ route('penilaian.store') }}', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    }).then(function(response) {
+                        if (response.ok) {
+                            autosaveLastTime = new Date();
+                            setAutosaveStatus('success',
+                                '<i class="ti ti-circle-check text-success me-1"></i>Tersimpan ' + formatRelativeTime(autosaveLastTime));
+                        } else {
+                            setAutosaveStatus('danger',
+                                '<i class="ti ti-alert-circle text-danger me-1"></i>Gagal menyimpan');
+                        }
+                    }).catch(function() {
+                        setAutosaveStatus('danger',
+                            '<i class="ti ti-alert-circle text-danger me-1"></i>Gagal menyimpan (offline?)');
+                    });
+                }, 500);
+            };
         });
     </script>
 @endpush
