@@ -203,12 +203,40 @@
                             </div>
                         </div>
 
+                        {{-- Search & Filter --}}
+                        <form method="GET" action="/" class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="ti ti-search"></i></span>
+                                    <input type="text" name="q" class="form-control" placeholder="Cari nama, username, atau NIS..." value="{{ $search }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="status" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Semua Status</option>
+                                    <option value="belum"   {{ $statusFilter === 'belum'   ? 'selected' : '' }}>Belum Mengisi</option>
+                                    <option value="sedang"  {{ $statusFilter === 'sedang'  ? 'selected' : '' }}>Sedang Mengisi</option>
+                                    <option value="selesai" {{ $statusFilter === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="ti ti-filter me-1"></i>Filter
+                                </button>
+                                @if($search !== '' || $statusFilter !== '')
+                                    <a href="/" class="btn btn-outline-secondary">
+                                        <i class="ti ti-x"></i>
+                                    </a>
+                                @endif
+                            </div>
+                        </form>
+
                         {{-- Table --}}
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
+                                        <th>#</th>
                                         <th>Nama Siswa</th>
                                         <th>Username</th>
                                         <th>Status</th>

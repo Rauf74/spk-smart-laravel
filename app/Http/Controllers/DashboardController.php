@@ -23,7 +23,7 @@ class DashboardController extends Controller
     /**
      * Tampilkan halaman dashboard dengan semua statistik.
      */
-    public function index()
+    public function index(Request $request)
     {
         // ==============================================
         // STATISTIK CARDS
@@ -43,8 +43,18 @@ class DashboardController extends Controller
         $totalPertanyaan = \App\Models\Pertanyaan::count();
 
         // Query dasar untuk status siswa (di-reuse untuk stats + tabel)
+        $search = trim((string) $request->query('q', ''));
+        $statusFilter = $request->query('status', ''); // '', 'belum', 'sedang', 'selesai'
+
         $siswaQuery = User::where('role', 'Siswa')
             ->leftJoin('penilaian as p', 'users.id_user', '=', 'p.id_user')
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('users.nama_user', 'LIKE', "%{$search}%")
+                        ->orWhere('users.username', 'LIKE', "%{$search}%")
+                        ->orWhere('users.nis', 'LIKE', "%{$search}%");
+                });
+            })
             ->selectRaw('
                 users.id_user,
                 users.nama_user,
@@ -86,9 +96,11 @@ class DashboardController extends Controller
         $selesaiIsi = $allSiswaStatus->where('status', 'selesai')->count();
 
         // Tabel siswa dengan pagination (10 per halaman)
+        // Filter status diterapkan di post-map (karena status dihitung dari jawaban_count)
         $siswaStatusPaginated = (clone $siswaQuery)
             ->orderBy('users.nama_user')
             ->paginate(10)
+            ->withQueryString() // penting: pagination link bawa query string ?q=...&status=...
             ->through(function ($siswa) use ($totalPertanyaan) {
                 $jawaban = $siswa->jawaban_count;
                 if ($jawaban == 0) {
@@ -111,6 +123,12 @@ class DashboardController extends Controller
                 }
                 return $siswa;
             });
+
+        // Filter status di koleksi (post-pagination, karena status baru dihitung setelah map)
+        if (in_array($statusFilter, ['belum', 'sedang', 'selesai'], true)) {
+            $filtered = $siswaStatusPaginated->getCollection()->filter(fn ($s) => $s->status === $statusFilter)->values();
+            $siswaStatusPaginated->setCollection($filtered);
+        }
 
         // ==============================================
         // DATA UNTUK GRAFIK
@@ -166,6 +184,8 @@ class DashboardController extends Controller
             'sedang_isi' => $sedangIsi,
             'selesai_isi' => $selesaiIsi,
             'total_pertanyaan' => $totalPertanyaan,
+            'search' => $search,
+            'statusFilter' => $statusFilter,
         ]);
     }
 
