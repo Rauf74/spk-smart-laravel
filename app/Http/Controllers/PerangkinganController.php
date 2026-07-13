@@ -71,9 +71,15 @@ class PerangkinganController extends Controller
         }
 
         // Ambil catatan konseling jika ada
-        $catatanKonseling = CatatanKonseling::where('id_user', $userId)
-            ->where('id_guru', $currentUser->id_user)
-            ->first();
+        $catatanKonseling = null;
+        if ($currentUser->role === 'Guru BK') {
+            $catatanKonseling = CatatanKonseling::where('id_user', $userId)
+                ->where('id_guru', $currentUser->id_user)
+                ->first();
+        } else {
+            $catatanKonseling = CatatanKonseling::where('id_user', $userId)
+                ->first();
+        }
 
         return view('perangkingan.index', [
             'kriterias'         => $kriterias,
@@ -128,12 +134,43 @@ class PerangkinganController extends Controller
         $topAlternatif = $hasil[0] ?? null;
         $persenKecocokan = $topAlternatif ? min(100, round($topAlternatif['nilai_akhir'] * 100)) : 0;
 
+        // Ambil 2 kriteria dengan utility tertinggi di winner untuk alasan rekomendasi
+        $insightKriterias = [];
+        if ($topAlternatif) {
+            $utilities = $topAlternatif['utility'];
+            arsort($utilities);
+            $topTwo = array_slice($utilities, 0, 2, true);
+
+            foreach ($topTwo as $idKriteria => $utilityVal) {
+                $kriteria = $kriterias->firstWhere('id_kriteria', $idKriteria);
+                if ($kriteria) {
+                    $insightKriterias[] = [
+                        'nama' => $kriteria->nama_kriteria,
+                        'utility' => $utilityVal,
+                    ];
+                }
+            }
+        }
+
+        // Ambil catatan konseling jika ada
+        $catatanKonseling = null;
+        if ($currentUser->role === 'Guru BK') {
+            $catatanKonseling = CatatanKonseling::where('id_user', $userId)
+                ->where('id_guru', $currentUser->id_user)
+                ->first();
+        } else {
+            $catatanKonseling = CatatanKonseling::where('id_user', $userId)
+                ->first();
+        }
+
         $pdf = Pdf::loadView('perangkingan.pdf', [
             'siswa' => $siswa,
             'kriterias' => $kriterias,
             'hasil' => $hasil,
             'topAlternatif' => $topAlternatif,
             'persenKecocokan' => $persenKecocokan,
+            'insightKriterias' => $insightKriterias,
+            'catatanKonseling' => $catatanKonseling,
             'tanggal' => now()->format('d F Y'),
         ]);
 
