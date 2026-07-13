@@ -385,6 +385,27 @@
                 </div>
             </div>
         @endif
+
+        {{-- Catatan Konseling (Siswa Only - Read-only View) --}}
+        @if(Auth::user()->role === 'Siswa' && isset($catatanKonseling))
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-start border-warning border-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-semibold mb-3">
+                                <i class="ti ti-notes me-2 text-warning"></i>Catatan Konseling Guru BK
+                            </h5>
+                            <p class="fs-5 mb-3 text-dark" style="font-style: italic;">
+                                "{{ $catatanKonseling->catatan }}"
+                            </p>
+                            <div class="text-muted small">
+                                Ditulis oleh: <strong>{{ $catatanKonseling->guru->nama_user ?? 'Guru BK' }}</strong> pada {{ $catatanKonseling->updated_at->format('d M Y H:i') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
 

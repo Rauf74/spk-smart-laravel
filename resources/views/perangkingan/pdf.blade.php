@@ -29,7 +29,7 @@
 
     <div class="section">
         <p><strong>Nama Siswa:</strong> {{ $siswa->nama_user }}</p>
-        <p><strong>Username:</strong> {{ $siswa->username }}</p>
+        <p><strong>NIS:</strong> {{ $siswa->nis ?? '-' }}</p>
         <p><strong>Tanggal:</strong> {{ $tanggal }}</p>
     </div>
 
@@ -38,6 +38,30 @@
             <h1>Rekomendasi Utama</h1>
             <div class="persen">{{ $topAlternatif['nama_alternatif'] }}</div>
             <p>Skor Kecocokan: <strong>{{ $persenKecocokan }}%</strong></p>
+        </div>
+
+        @if(count($insightKriterias) > 0)
+            <div style="background: #f4f6fd; border-left: 4px solid #5D87FF; padding: 10px 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; font-size: 10pt; color: #555;">
+                    <strong>Alasan Rekomendasi:</strong> Hasil ini didasarkan pada skor kuat di 
+                    <strong>{{ $insightKriterias[0]['nama'] }}</strong> 
+                    @if(count($insightKriterias) > 1) 
+                        dan <strong>{{ $insightKriterias[1]['nama'] }}</strong>
+                    @endif.
+                </p>
+            </div>
+        @endif
+    @endif
+
+    @if($catatanKonseling)
+        <div style="background: #fffdf5; border-left: 4px solid #ffc107; padding: 12px 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #ffeeba;">
+            <p style="margin: 0 0 5px 0; font-size: 10pt; font-weight: bold; color: #856404;">Catatan Konseling Guru BK:</p>
+            <p style="margin: 0; font-size: 10pt; font-style: italic; color: #666;">
+                "{{ $catatanKonseling->catatan }}"
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 8pt; color: #999; text-align: right;">
+                Oleh {{ $catatanKonseling->guru->nama_user ?? 'Guru BK' }}
+            </p>
         </div>
     @endif
 
