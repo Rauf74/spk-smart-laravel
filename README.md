@@ -110,10 +110,12 @@ Format yang digunakan di repo ini:
 
 ## Deployment (Production)
 
-1. Set `APP_ENV=production` dan `APP_DEBUG=false`
-2. Migrate database production
-3. Optimasi: `php artisan config:cache`, `php artisan route:cache`
-4. Build asset: `npm run build`
+Konfigurasi `Dockerfile` sudah membangun asset Vite dan menjalankan migration saat container dimulai, sehingga deploy dari clone baru tidak bergantung pada folder `public/build` lokal.
+
+1. Gunakan `render.yaml` sebagai Web Service Docker dan set `APP_ENV=production`, `APP_DEBUG=false`, serta `APP_URL`.
+2. Buat PostgreSQL managed database, lalu isi `DATABASE_URL` dan biarkan `DB_CONNECTION=pgsql`.
+3. Render akan membuat `APP_KEY`; jangan masukkan `.env` production ke repository.
+4. Setelah deploy, verifikasi login Guru BK, wizard siswa, hasil SMART, dan export PDF.
 
 ---
 
