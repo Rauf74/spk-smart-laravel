@@ -14,6 +14,8 @@ use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PerhitunganController;
 use App\Http\Controllers\PerangkinganController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PenilaianExportController;
+use App\Http\Controllers\AuditLogController;
 
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
