@@ -39,5 +39,12 @@ class AppServiceProvider extends ServiceProvider
         foreach (AuditObserver::auditableModels() as $modelClass) {
             $modelClass::observe($auditObserver);
         }
+
+        // Behind Render's TLS-terminating proxy the request arrives as HTTP, so
+        // Laravel would otherwise generate http:// asset and form URLs. Force
+        // HTTPS in production to avoid Mixed Content errors.
+        if (env('APP_ENV') === 'production') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
