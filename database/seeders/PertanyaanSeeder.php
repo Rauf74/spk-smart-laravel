@@ -43,7 +43,7 @@ class PertanyaanSeeder extends Seeder
         ];
 
         foreach ($pertanyaans as $p) {
-            Pertanyaan::create($p);
+            Pertanyaan::updateOrCreate(['id_pertanyaan' => $p['id_pertanyaan']], $p);
         }
     }
 }

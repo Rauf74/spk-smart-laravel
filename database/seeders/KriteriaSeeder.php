@@ -22,7 +22,7 @@ class KriteriaSeeder extends Seeder
         ];
 
         foreach ($kriterias as $kriteria) {
-            Kriteria::create($kriteria);
+            Kriteria::updateOrCreate(['id_kriteria' => $kriteria['id_kriteria']], $kriteria);
         }
     }
 }

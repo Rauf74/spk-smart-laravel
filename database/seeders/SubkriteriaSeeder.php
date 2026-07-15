@@ -51,7 +51,7 @@ class SubkriteriaSeeder extends Seeder
 
 
         foreach ($subkriterias as $sub) {
-            Subkriteria::create($sub);
+            Subkriteria::updateOrCreate(['id_subkriteria' => $sub['id_subkriteria']], $sub);
         }
     }
 }

@@ -61,4 +61,4 @@ EXPOSE 80
 # are supplied by Render environment variables, never baked into the image.
 # Apache is reconfigured to listen on $PORT at runtime, and migrations are
 # retried to survive a database that is not ready on a cold start.
-CMD ["sh", "-c", "sed -i \"s/^Listen 80/Listen ${PORT:-80}/\" /etc/apache2/ports.conf && sed -i \"s/:80>/:${PORT:-80}>/\" /etc/apache2/sites-available/000-default.conf && for i in $(seq 1 15); do php artisan migrate --force && break || sleep 5; done && exec apache2-foreground"]
+CMD ["sh", "-c", "sed -i \"s/^Listen 80/Listen ${PORT:-80}/\" /etc/apache2/ports.conf && sed -i \"s/:80>/:${PORT:-80}>/\" /etc/apache2/sites-available/000-default.conf && for i in $(seq 1 15); do php artisan migrate --force && break || sleep 5; done && php artisan seed:if-empty && exec apache2-foreground"]

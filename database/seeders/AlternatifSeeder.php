@@ -20,7 +20,7 @@ class AlternatifSeeder extends Seeder
         ];
 
         foreach ($alternatifs as $alt) {
-            Alternatif::create($alt);
+            Alternatif::updateOrCreate(['id_alternatif' => $alt['id_alternatif']], $alt);
         }
     }
 }
