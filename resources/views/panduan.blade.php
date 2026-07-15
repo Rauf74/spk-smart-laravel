@@ -179,7 +179,7 @@
                 <h4 class="mb-0 fw-bold">Bagaimana Metode SMART Menghitung Hasil? (7 Tahap Algoritma)</h4>
             </div>
             <p class="text-muted fs-4 mb-4">
-                Berdasarkan struktur pemrosesan data ilmiah metode SMART, berikut adalah **7 Tahap Perhitungan** yang dirujuk dari rancangan skripsi dan diimplementasikan secara terstruktur pada menu **Detail Perhitungan**:
+                Berdasarkan struktur pemrosesan data ilmiah metode SMART, berikut adalah <strong>7 Tahap Perhitungan</strong> yang dirujuk dari rancangan skripsi dan diimplementasikan secara terstruktur pada menu <strong>Detail Perhitungan</strong>:
             </p>
 
             <div class="accordion" id="accordionSMART">
@@ -192,7 +192,7 @@
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Menetapkan himpunan pilihan program studi ($A_i$) yang akan dievaluasi kelayakan kecocokannya oleh sistem (misalnya: *Teknik Informatika*, *Sistem Informasi*, dsb) sesuai data tabel <code>alternatif</code>.</p>
+                            <p class="mb-0 text-muted">Menetapkan himpunan pilihan program studi (<i>A<sub>i</sub></i>) yang akan dievaluasi kelayakan kecocokannya oleh sistem (misalnya: *Teknik Informatika*, *Sistem Informasi*, dsb) sesuai data tabel <code>alternatif</code>.</p>
                         </div>
                     </div>
                 </div>
@@ -206,7 +206,7 @@
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Mengidentifikasi dimensi atau parameter penentu ($C_j$) yang digunakan sebagai acuan penarikan keputusan (seperti: *Minat*, *Prestasi*, *Kesiapan Mental*, dsb) beserta jenis kriteria (*Benefit* atau *Cost*).</p>
+                            <p class="mb-0 text-muted">Mengidentifikasi dimensi atau parameter penentu (<i>C<sub>j</sub></i>) yang digunakan sebagai acuan penarikan keputusan (seperti: *Minat*, *Prestasi*, *Kesiapan Mental*, dsb) beserta jenis kriteria (*Benefit* atau *Cost*).</p>
                         </div>
                     </div>
                 </div>
@@ -215,12 +215,12 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThree">
                         <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            Tahap 3: Menentukan Bobot Kriteria (Wⱼ)
+                            Tahap 3: Menentukan Bobot Kriteria (W<sub>j</sub>)
                         </button>
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Memberikan nilai bobot kepentingan awal ($W_j$) pada tiap faktor penilaian berdasarkan prioritas tingkat kepentingannya oleh Guru BK (misal: Minat = 30%, Prestasi = 25%, dsb) dengan batas total keseluruhan $100\%$.</p>
+                            <p class="mb-0 text-muted">Memberikan nilai bobot kepentingan awal (<i>W<sub>j</sub></i>) pada tiap faktor penilaian berdasarkan prioritas tingkat kepentingannya oleh Guru BK (misal: Minat = 30%, Prestasi = 25%, dsb) dengan batas total keseluruhan 100%.</p>
                         </div>
                     </div>
                 </div>
@@ -229,14 +229,14 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFour">
                         <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            Tahap 4: Normalisasi Bobot Kriteria (wⱼ)
+                            Tahap 4: Normalisasi Bobot Kriteria (w<sub>j</sub>)
                         </button>
                     </h2>
                     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-2">Membagi nilai bobot masing-masing kriteria dengan total seluruh bobot kriteria untuk mendapatkan nilai bobot relatif ($w_j$).</p>
+                            <p class="mb-2">Membagi nilai bobot masing-masing kriteria dengan total seluruh bobot kriteria untuk mendapatkan nilai bobot relatif (<i>w<sub>j</sub></i>).</p>
                             <div class="bg-light p-3 rounded text-center mb-3">
-                                <span class="fs-5 fw-semibold text-primary">Normalisasi Kriteria (wⱼ) = Wⱼ / ΣWⱼ</span>
+                                <span class="fs-5 fw-semibold text-primary">Normalisasi Kriteria (<i>w<sub>j</sub></i>) = <i>W<sub>j</sub></i> / &Sigma;<i>W<sub>j</sub></i></span>
                             </div>
                             <p class="small text-muted mb-0"><em>Di sistem ini, normalisasi dihitung otomatis menggunakan formula <code>round($kriteria->bobot / $totalBobot, 4)</code>.</em></p>
                         </div>
@@ -252,7 +252,7 @@
                     </h2>
                     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Mengambil data nilai mentah ($x$) dari jawaban siswa terhadap pertanyaan kuesioner prodi. Nilai ini didasarkan pada pilihan jawaban subkriteria yang memiliki bobot terdefinisi (skala 1 s.d 5).</p>
+                            <p class="mb-0 text-muted">Mengambil data nilai mentah (<i>x</i>) dari jawaban siswa terhadap pertanyaan kuesioner prodi. Nilai ini didasarkan pada pilihan jawaban subkriteria yang memiliki bobot terdefinisi (skala 1 s.d 5).</p>
                         </div>
                     </div>
                 </div>
@@ -261,19 +261,19 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingSix">
                         <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                            Tahap 6: Menghitung Nilai Utility (uᵢ(a))
+                            Tahap 6: Menghitung Nilai Utility (u<sub>i</sub>(a))
                         </button>
                     </h2>
                     <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-3">Mengonversi nilai mentah siswa ($x$) menjadi skala utility terstandarisasi antara 0 s.d 1. Cara konversi dipisahkan berdasarkan jenis kriteria:</p>
+                            <p class="mb-3">Mengonversi nilai mentah siswa (<i>x</i>) menjadi skala utility terstandarisasi antara 0 s.d 1. Cara konversi dipisahkan berdasarkan jenis kriteria:</p>
                             <div class="row">
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <div class="p-3 border rounded bg-light-primary">
                                         <h6 class="fw-bold text-primary mb-2">Kriteria Benefit (Keuntungan)</h6>
                                         <p class="small text-muted mb-2">Makin besar nilai jawaban makin bagus (misal: Minat, Bakat).</p>
                                         <div class="bg-white p-2 rounded text-center fw-bold small">
-                                            Utility u(x) = (x - x_min) / (x_max - x_min)
+                                            Utility <i>u(x)</i> = (<i>x</i> - <i>x<sub>min</sub></i>) / (<i>x<sub>max</sub></i> - <i>x<sub>min</sub></i>)
                                         </div>
                                     </div>
                                 </div>
@@ -282,7 +282,7 @@
                                         <h6 class="fw-bold text-warning-emphasis mb-2">Kriteria Cost (Beban/Biaya)</h6>
                                         <p class="small text-muted mb-2">Makin kecil nilai jawaban makin bagus (misal: Biaya Kuliah).</p>
                                         <div class="bg-white p-2 rounded text-center fw-bold small">
-                                            Utility u(x) = (x_max - x) / (x_max - x_min)
+                                            Utility <i>u(x)</i> = (<i>x<sub>max</sub></i> - <i>x</i>) / (<i>x<sub>max</sub></i> - <i>x<sub>min</sub></i>)
                                         </div>
                                     </div>
                                 </div>
@@ -300,9 +300,9 @@
                     </h2>
                     <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-2">Menghitung nilai kelayakan akhir alternatif ($V(a)$) dengan menjumlahkan hasil perkalian **Nilai Utility** dengan **Normalisasi Bobot** untuk setiap kriteria pada alternatif tersebut.</p>
+                            <p class="mb-2">Menghitung nilai kelayakan akhir alternatif (<i>V(a)</i>) dengan menjumlahkan hasil perkalian <strong>Nilai Utility</strong> dengan <strong>Normalisasi Bobot</strong> untuk setiap kriteria pada alternatif tersebut.</p>
                             <div class="bg-light p-3 rounded text-center mb-3">
-                                <span class="fs-5 fw-semibold text-primary">Nilai Akhir V(a) = Σ (uᵢ(a) × wⱼ)</span>
+                                <span class="fs-5 fw-semibold text-primary">Nilai Akhir <i>V(a)</i> = &Sigma; (<i>u<sub>i</sub>(a)</i> &times; <i>w<sub>j</sub></i>)</span>
                             </div>
                             <p class="small text-muted mb-0">Alternatif (Program Studi) dengan Nilai Akhir tertinggi diurutkan ke peringkat pertama sebagai rekomendasi prodi terbaik untuk siswa.</p>
                         </div>
