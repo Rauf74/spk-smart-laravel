@@ -62,14 +62,14 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="ps-3"><strong class="text-primary">Alternatif</strong></td>
-                            <td><span class="badge bg-primary fs-3">Program Studi</span></td>
-                            <td>Pilihan jurusan/program studi yang akan direkomendasikan sistem kepada siswa (misal: Teknik Informatika, Sistem Informasi, dsb).</td>
-                        </tr>
-                        <tr>
                             <td class="ps-3"><strong class="text-success">Kriteria</strong></td>
                             <td><span class="badge bg-success fs-3">Faktor Penilaian</span></td>
                             <td>Dimensi atau parameter yang digunakan sebagai dasar penilaian (misal: Minat, Kesiapan Finansial, dsb).</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3"><strong class="text-primary">Alternatif</strong></td>
+                            <td><span class="badge bg-primary fs-3">Program Studi</span></td>
+                            <td>Pilihan jurusan/program studi yang akan direkomendasikan sistem kepada siswa (misal: Teknik Informatika, Sistem Informasi, dsb).</td>
                         </tr>
                         <tr>
                             <td class="ps-3"><strong class="text-warning">Subkriteria</strong></td>
@@ -187,12 +187,12 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
                         <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            Tahap 1: Menentukan Alternatif (Program Studi)
+                            Tahap 1: Menentukan Kriteria (Faktor Penilaian)
                         </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Menetapkan himpunan pilihan program studi (<i>A<sub>i</sub></i>) yang akan dievaluasi kelayakan kecocokannya oleh sistem (misalnya: *Teknik Informatika*, *Sistem Informasi*, dsb) sesuai data tabel <code>alternatif</code>.</p>
+                            <p class="mb-0 text-muted">Mengidentifikasi dimensi atau parameter penentu (<i>C<sub>j</sub></i>) yang digunakan sebagai acuan penarikan keputusan (seperti: <em>Minat</em>, <em>Prestasi</em>, <em>Kesiapan Mental</em>, dsb) beserta jenis kriteria (<em>Benefit</em> atau <em>Cost</em>).</p>
                         </div>
                     </div>
                 </div>
@@ -201,12 +201,12 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
                         <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            Tahap 2: Menentukan Kriteria (Faktor Penilaian)
+                            Tahap 2: Menentukan Alternatif (Program Studi)
                         </button>
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSMART">
                         <div class="accordion-body">
-                            <p class="mb-0 text-muted">Mengidentifikasi dimensi atau parameter penentu (<i>C<sub>j</sub></i>) yang digunakan sebagai acuan penarikan keputusan (seperti: *Minat*, *Prestasi*, *Kesiapan Mental*, dsb) beserta jenis kriteria (*Benefit* atau *Cost*).</p>
+                            <p class="mb-0 text-muted">Menetapkan himpunan pilihan program studi (<i>A<sub>i</sub></i>) yang akan dievaluasi kelayakan kecocokannya oleh sistem (misalnya: <em>Teknik Informatika</em>, <em>Sistem Informasi</em>, dsb) sesuai data tabel <code>alternatif</code>.</p>
                         </div>
                     </div>
                 </div>
