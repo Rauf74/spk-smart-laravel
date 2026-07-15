@@ -42,7 +42,11 @@ class PenilaianExportController extends Controller
             . '.xlsx';
 
         $export = new PenilaianExport($filename, $kelas);
-        $filepath = $export->store(storage_path('app/exports'));
+        $dir = storage_path('app/exports');
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $filepath = $export->store($dir);
 
         return response()->download($filepath, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

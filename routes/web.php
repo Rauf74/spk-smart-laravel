@@ -44,7 +44,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('perangkingan/pdf', [PerangkinganController::class, 'exportPDF'])->name('perangkingan.pdf');
 
     // Master Data (ADMIN ONLY - Guru BK)
-    // Master Data (ADMIN ONLY - Guru BK)
     Route::middleware(['can:access-master-data'])->group(function () {
         Route::resource('kriteria', KriteriaController::class);
         Route::resource('subkriteria', SubkriteriaController::class);
