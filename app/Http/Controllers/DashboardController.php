@@ -46,13 +46,15 @@ class DashboardController extends Controller
         $search = trim((string) $request->query('q', ''));
         $statusFilter = $request->query('status', ''); // '', 'belum', 'sedang', 'selesai'
 
+        $likeOperator = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ILIKE' : 'LIKE';
+
         $siswaQuery = User::where('role', 'Siswa')
             ->leftJoin('penilaian as p', 'users.id_user', '=', 'p.id_user')
-            ->when($search !== '', function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    $sub->where('users.nama_user', 'LIKE', "%{$search}%")
-                        ->orWhere('users.username', 'LIKE', "%{$search}%")
-                        ->orWhere('users.nis', 'LIKE', "%{$search}%");
+            ->when($search !== '', function ($q) use ($search, $likeOperator) {
+                $q->where(function ($sub) use ($search, $likeOperator) {
+                    $sub->where('users.nama_user', $likeOperator, "%{$search}%")
+                        ->orWhere('users.username', $likeOperator, "%{$search}%")
+                        ->orWhere('users.nis', $likeOperator, "%{$search}%");
                 });
             })
             ->selectRaw('
