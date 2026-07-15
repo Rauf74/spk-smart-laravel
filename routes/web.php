@@ -27,6 +27,7 @@ Route::post('/register', [LoginController::class, 'register']);
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('panduan', [DashboardController::class, 'panduan'])->name('panduan');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');

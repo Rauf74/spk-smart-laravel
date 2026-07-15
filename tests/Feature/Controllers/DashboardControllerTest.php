@@ -300,4 +300,24 @@ class DashboardControllerTest extends TestCase
         $response = $this->get('/');
         $response->assertRedirect('/login');
     }
+
+    // ============================================================
+    // 5. Panduan Page
+    // ============================================================
+
+    #[Test]
+    public function panduan_page_bisa_diakses_oleh_user_terautentikasi(): void
+    {
+        $response = $this->actingAs($this->guru)->get('/panduan');
+        $response->assertStatus(200);
+        $response->assertViewIs('panduan');
+        $response->assertSee('Tentang SPK SMART');
+    }
+
+    #[Test]
+    public function panduan_page_memerlukan_authentication(): void
+    {
+        $response = $this->get('/panduan');
+        $response->assertRedirect('/login');
+    }
 }

@@ -25,6 +25,13 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a class="sidebar-link {{ request()->routeIs('panduan') ? 'active' : '' }}"
+                        href="{{ route('panduan') }}" aria-expanded="false">
+                        <span><i class="ti ti-help"></i></span>
+                        <span class="hide-menu">Panduan</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a class="sidebar-link {{ request()->routeIs('profile') ? 'active' : '' }}"
                         href="{{ route('profile') }}" aria-expanded="false">
                         <span><i class="ti ti-user"></i></span>

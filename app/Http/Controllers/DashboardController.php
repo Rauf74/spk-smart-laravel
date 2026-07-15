@@ -376,4 +376,12 @@ class DashboardController extends Controller
 
         return $data;
     }
+
+    /**
+     * Tampilkan halaman panduan penggunaan sistem.
+     */
+    public function panduan()
+    {
+        return view('panduan');
+    }
 }
