@@ -152,7 +152,7 @@ php artisan serve
 ```
 Visit `http://localhost:8000`.
 
-**Default counselor account:** `gurubk1` / `123456` (siswa: `siswa1` / `siswa123`)
+**Default counselor account:** `gurubk` / `password` (siswa: `siswa01` / `password`)
 
 ### 5. Development mode (recommended)
 ```bash
