@@ -53,9 +53,12 @@ RUN chown -R www-data:www-data /var/www/html \
 # Configure Apache DocumentRoot
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 
-# Expose port
+# Render injects the $PORT environment variable (default 10000). Apache must
+# listen on that port or the health check / routing will fail.
 EXPOSE 80
 
 # Run outstanding migrations before Apache starts. APP_KEY and DATABASE_URL
 # are supplied by Render environment variables, never baked into the image.
-CMD ["sh", "-c", "php artisan migrate --force && exec apache2-foreground"]
+# Apache is reconfigured to listen on $PORT at runtime, and migrations are
+# retried to survive a database that is not ready on a cold start.
+CMD ["sh", "-c", "sed -i \"s/^Listen 80/Listen ${PORT:-80}/\" /etc/apache2/ports.conf && sed -i \"s/:80>/:${PORT:-80}>/\" /etc/apache2/sites-available/000-default.conf && for i in $(seq 1 15); do php artisan migrate --force && break || sleep 5; done && exec apache2-foreground"]
