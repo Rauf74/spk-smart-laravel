@@ -96,8 +96,18 @@ class DashboardController extends Controller
         $selesaiIsi = $allSiswaStatus->where('status', 'selesai')->count();
 
         // Tabel siswa dengan pagination (10 per halaman)
-        // Filter status diterapkan di post-map (karena status dihitung dari jawaban_count)
-        $siswaStatusPaginated = (clone $siswaQuery)
+        // Filter status diterapkan pada level query SQL (database) menggunakan havingRaw
+        $siswaQueryPaginated = clone $siswaQuery;
+
+        if ($statusFilter === 'belum') {
+            $siswaQueryPaginated->havingRaw('COUNT(DISTINCT p.id_pertanyaan) = 0');
+        } elseif ($statusFilter === 'sedang') {
+            $siswaQueryPaginated->havingRaw('COUNT(DISTINCT p.id_pertanyaan) > 0 AND COUNT(DISTINCT p.id_pertanyaan) < ?', [$totalPertanyaan]);
+        } elseif ($statusFilter === 'selesai') {
+            $siswaQueryPaginated->havingRaw('COUNT(DISTINCT p.id_pertanyaan) >= ?', [$totalPertanyaan]);
+        }
+
+        $siswaStatusPaginated = $siswaQueryPaginated
             ->orderBy('users.nama_user')
             ->paginate(10)
             ->withQueryString() // penting: pagination link bawa query string ?q=...&status=...
@@ -108,6 +118,7 @@ class DashboardController extends Controller
                     $siswa->status_label = 'Belum Mengisi';
                     $siswa->status_class = 'bg-danger';
                     $siswa->status_icon = 'ti ti-circle-x';
+                    $siswa->progress = 0;
                 } elseif ($jawaban < $totalPertanyaan) {
                     $siswa->status = 'sedang';
                     $siswa->status_label = 'Sedang Mengisi';
@@ -123,12 +134,6 @@ class DashboardController extends Controller
                 }
                 return $siswa;
             });
-
-        // Filter status di koleksi (post-pagination, karena status baru dihitung setelah map)
-        if (in_array($statusFilter, ['belum', 'sedang', 'selesai'], true)) {
-            $filtered = $siswaStatusPaginated->getCollection()->filter(fn ($s) => $s->status === $statusFilter)->values();
-            $siswaStatusPaginated->setCollection($filtered);
-        }
 
         // ==============================================
         // STATISTIK AGREGAT (B1)
