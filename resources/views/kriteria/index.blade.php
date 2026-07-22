@@ -8,16 +8,18 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Faktor Penilaian</h1>
-        <p class="fs-6 mb-4">Berisi aspek-aspek penilaian yang menjadi dasar untuk merekomendasikan program studi.</p>
+        <x-page-header 
+            title="Faktor Penilaian" 
+            subtitle="Berisi aspek-aspek penilaian yang menjadi dasar untuk merekomendasikan program studi."
+            icon="ti-list-check" 
+        />
 
         {{-- Total Bobot Indicator --}}
         @php
             $persenBobot = min(100, round($totalBobot, 2));
             $sisaBobot = max(0, round(100 - $totalBobot, 2));
             $progressClass = $totalBobot == 100 ? 'bg-success' : ($totalBobot > 100 ? 'bg-danger' : 'bg-warning');
-            $alertClass = $totalBobot == 100 ? 'alert-success' : ($totalBobot > 100 ? 'alert-danger' : 'alert-warning');
-            $alertIcon = $totalBobot == 100 ? 'ti-check' : ($totalBobot > 100 ? 'ti-alert-circle' : 'ti-info-circle');
+            $alertType = $totalBobot == 100 ? 'success' : ($totalBobot > 100 ? 'danger' : 'warning');
             $alertTitle = $totalBobot == 100 ? 'Bobot Sudah Pas' : ($totalBobot > 100 ? 'Bobot Melebihi 100%' : 'Bobot Belum Lengkap');
             $alertMsg = $totalBobot == 100
                 ? 'Total bobot sudah 100%. Sistem siap digunakan untuk perhitungan.'
@@ -49,11 +51,10 @@
                             <small class="text-muted">100%</small>
                         </div>
 
-                        <div class="alert {{ $alertClass }} d-flex align-items-center mt-3 mb-0 py-2" role="alert">
-                            <i class="ti {{ $alertIcon }} fs-4 me-3"></i>
-                            <div>
+                        <div class="mt-3">
+                            <x-alert :type="$alertType" :dismissible="false">
                                 <strong>{{ $alertTitle }}</strong> — {{ $alertMsg }}
-                            </div>
+                            </x-alert>
                         </div>
                     </div>
                 </div>
@@ -61,24 +62,23 @@
         </div>
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <x-alert type="danger">
                 <ul class="mb-0">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </x-alert>
         @endif
 
         <button type="button" class="btn btn-primary m-1 mt-3" data-bs-toggle="modal" data-bs-target="#kriteriaModal"
             onclick="resetForm()">
-            Tambah Kriteria
+            <i class="ti ti-plus me-1"></i> Tambah Kriteria
         </button>
 
         <div class="py-6 text-center">
             <div class="table-responsive">
-                <table id="myTableKriteria" class="display dt-responsive nowrap" style="width:100%">
+                <table id="myTableKriteria" class="display dt-responsive nowrap js-datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -173,16 +173,11 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#myTableKriteria').DataTable();
-        });
-
         function resetForm() {
             document.getElementById('modalTitle').innerText = 'Tambah Kriteria';
             document.getElementById('kriteriaForm').action = '{{ route("kriteria.store") }}';

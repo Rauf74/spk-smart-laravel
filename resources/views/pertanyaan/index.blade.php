@@ -8,26 +8,26 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Daftar Pertanyaan</h1>
-        <p class="fs-6 mb-4">Pertanyaan-pertanyaan yang akan dijawab siswa dalam kuesioner penilaian.</p>
-
-
+        <x-page-header 
+            title="Daftar Pertanyaan" 
+            subtitle="Pertanyaan-pertanyaan yang akan dijawab siswa dalam kuesioner penilaian."
+            icon="ti-help" 
+        />
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <x-alert type="danger">
                 <ul class="mb-0">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </x-alert>
         @endif
 
         <!-- Dynamic Tables Container -->
         <div class="py-4">
             @foreach($alternatifs as $alternatif)
-                <div class="card mb-4 shadow-sm border">
+                <div class="card mb-4 shadow-sm border border-0">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-primary">Prodi: {{ $alternatif->nama_alternatif }}</h5>
                         <button type="button" class="btn btn-primary btn-sm"
@@ -37,7 +37,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle display datatable-pertanyaan dt-responsive nowrap"
+                            <table class="table table-striped table-hover align-middle display datatable-pert dt-responsive nowrap"
                                 style="width:100%">
                                 <thead class="table-light">
                                     <tr>
@@ -56,7 +56,7 @@
                                             <td>
                                                 <button class="btn btn-sm btn-warning me-1"
                                                     onclick="editPertanyaan({{ $pertanyaan->id_pertanyaan }}, {{ $pertanyaan->id_kriteria }}, {{ $alternatif->id_alternatif }}, `{{ addslashes($pertanyaan->teks_pertanyaan) }}`)">
-                                                    Edit
+                                                    <i class="ti ti-edit"></i> Edit
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger"
                                                     onclick="confirmDelete(
@@ -64,7 +64,7 @@
                                                         '<div class=\'text-start\'>Pertanyaan:<br><em>{{ addslashes($pertanyaan->teks_pertanyaan) }}</em><br><br>akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Penilaian siswa untuk pertanyaan ini akan ikut terhapus.</small></div>',
                                                         '{{ route('pertanyaan.destroy', $pertanyaan->id_pertanyaan) }}'
                                                     )">
-                                                    Hapus
+                                                    <i class="ti ti-trash"></i> Hapus
                                                 </button>
                                             </td>
                                         </tr>
@@ -73,7 +73,7 @@
                                         <tr>
                                             <td colspan="4" class="p-0">
                                                 <x-empty-state
-                                                    icon="ti ti-help"
+                                                    icon="ti-help"
                                                     title="Belum ada pertanyaan"
                                                     :message="'Tambahkan pertanyaan untuk ' . $alternatif->nama_alternatif" />
                                             </td>
@@ -99,9 +99,6 @@
                         <form id="pertanyaanForm" method="POST" action="{{ route('pertanyaan.store') }}">
                             @csrf
                             <input type="hidden" id="formMethod" name="_method" value="POST">
-
-                            {{-- Hidden Alternatif ID (set via JS) OR Dropdown DISABLED --}}
-                            {{-- PHP version sets it hidden. We can hide it or show read-only. --}}
                             <input type="hidden" id="id_alternatif" name="id_alternatif">
 
                             <div class="mb-3">
@@ -130,7 +127,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')

@@ -8,30 +8,30 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Program Studi</h1>
-        <p class="fs-6 mb-4">Daftar program studi yang tersedia sebagai alternatif rekomendasi.</p>
-
-
+        <x-page-header 
+            title="Program Studi" 
+            subtitle="Daftar program studi yang tersedia sebagai alternatif rekomendasi."
+            icon="ti-clipboard-list" 
+        />
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <x-alert type="danger">
                 <ul class="mb-0">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </x-alert>
         @endif
 
         <button type="button" class="btn btn-primary m-1 mt-3" data-bs-toggle="modal" data-bs-target="#alternatifModal"
             onclick="resetForm()">
-            Tambah Alternatif
+            <i class="ti ti-plus me-1"></i> Tambah Alternatif
         </button>
 
         <div class="py-6 text-center">
             <div class="table-responsive">
-                <table id="myTableAlternatif" class="display dt-responsive nowrap" style="width:100%">
+                <table id="myTableAlternatif" class="display dt-responsive nowrap js-datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -103,16 +103,11 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#myTableAlternatif').DataTable();
-        });
-
         function resetForm() {
             document.getElementById('modalTitle').innerText = 'Tambah Alternatif';
             document.getElementById('alternatifForm').action = '{{ route("alternatif.store") }}';

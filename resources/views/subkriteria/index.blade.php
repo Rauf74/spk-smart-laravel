@@ -8,24 +8,26 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Pilihan Jawaban</h1>
-        <p class="fs-6 mb-4">Daftar pilihan jawaban untuk setiap faktor penilaian.</p>
+        <x-page-header 
+            title="Pilihan Jawaban" 
+            subtitle="Daftar pilihan jawaban untuk setiap faktor penilaian."
+            icon="ti-list-details" 
+        />
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <x-alert type="danger">
                 <ul class="mb-0">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </x-alert>
         @endif
 
         <!-- Dynamic Tables Container -->
         <div class="py-4">
             @foreach($kriterias as $kriteria)
-                <div class="card mb-4 shadow-sm border">
+                <div class="card mb-4 shadow-sm border border-0">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-primary">Kriteria: {{ $kriteria->nama_kriteria }}</h5>
                         <button type="button" class="btn btn-primary btn-sm"
@@ -54,7 +56,7 @@
                                             <td>
                                                 <button class="btn btn-sm btn-warning me-1"
                                                     onclick="editSubkriteria({{ $sub->id_subkriteria }}, {{ $sub->id_kriteria }}, '{{ $sub->nama_subkriteria }}', '{{ $sub->nilai }}')">
-                                                    Edit
+                                                    <i class="ti ti-edit"></i> Edit
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger"
                                                     onclick="confirmDelete(
@@ -62,7 +64,7 @@
                                                         '<div class=\'text-start\'>Pilihan <strong>{{ $sub->nama_subkriteria }}</strong> (nilai: {{ $sub->nilai }}) akan dihapus permanen.<br><br><small class=\'text-danger\'>⚠️ Penilaian siswa yang menggunakan pilihan ini akan terpengaruh.</small></div>',
                                                         '{{ route('subkriteria.destroy', $sub->id_subkriteria) }}'
                                                     )">
-                                                    Hapus
+                                                    <i class="ti ti-trash"></i> Hapus
                                                 </button>
                                             </td>
                                         </tr>
@@ -71,7 +73,7 @@
                                         <tr>
                                             <td colspan="4" class="p-0">
                                                 <x-empty-state
-                                                    icon="ti ti-list"
+                                                    icon="ti-list"
                                                     title="Belum ada pilihan jawaban"
                                                     :message="'Tambahkan pilihan untuk kriteria ' . $kriteria->nama_kriteria" />
                                             </td>
@@ -130,27 +132,23 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
         $(document).ready(function () {
-            // Inisialisasi DataTable untuk setiap tabel subkriteria yg memiliki rows
             $('.datatable-sub').each(function () {
-                // Hanya init jika ada data row (selain empty placeholder)
                 if ($(this).find('tbody tr td').length > 1) {
                     $(this).DataTable({
                         paging: false,
-                        searching: false, // Matikan pencarian per tabel kecil
+                        searching: false,
                         info: false
                     });
                 }
             });
         });
 
-        // Initialize Modal
         var subkriteriaModal = new bootstrap.Modal(document.getElementById('subkriteriaModal'));
 
         function openAddModal(idKriteria) {

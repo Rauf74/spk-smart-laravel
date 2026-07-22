@@ -4,15 +4,14 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="mb-1">Audit Log</h1>
-            <p class="text-muted mb-0">Riwayat perubahan data master: tambah, ubah, hapus.</p>
-        </div>
-    </div>
+    <x-page-header 
+        title="Audit Log" 
+        subtitle="Riwayat perubahan data master: tambah, ubah, hapus."
+        icon="ti-history" 
+    />
 
     {{-- Filter --}}
-    <div class="card mb-3">
+    <div class="card mb-3 border-0 shadow-sm">
         <div class="card-body">
             <form method="GET" action="{{ route('audit.index') }}" class="row g-2 align-items-end">
                 <div class="col-md-3">
@@ -50,7 +49,7 @@
     </div>
 
     {{-- Table --}}
-    <div class="card">
+    <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -101,7 +100,7 @@
                             <tr>
                                 <td colspan="6" class="p-0">
                                     <x-empty-state
-                                        icon="ti ti-history"
+                                        icon="ti-history"
                                         title="Belum ada aktivitas"
                                         message="Aktivitas CRUD pada data master akan tercatat di sini." />
                                 </td>

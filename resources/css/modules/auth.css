@@ -1,0 +1,47 @@
+/* Auth Layout Styles */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f9fc;
+    padding: 20px;
+}
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.auth-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+.auth-wrapper .input-group-text {
+    background: #fff;
+    border-right: none;
+    color: #5a6a85;
+}
+.auth-wrapper .form-control {
+    border-left: none;
+}
+.auth-wrapper .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+.auth-wrapper .input-group:focus-within .input-group-text,
+.auth-wrapper .input-group:focus-within .form-control {
+    border-color: #5D87FF;
+}
+.btn-toggle-password {
+    border-left: none;
+    background: #fff;
+    color: #5a6a85;
+}
+.btn-toggle-password:hover,
+.btn-toggle-password:focus {
+    background: #fff;
+    color: #5D87FF;
+}

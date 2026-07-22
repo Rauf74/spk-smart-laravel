@@ -8,30 +8,30 @@
 
 @section('content')
     <div class="container-fluid">
-        <h1 class="mb-4">Data User</h1>
-        <p class="fs-6 mb-4">Berisi daftar pengguna sistem (Guru BK dan Siswa).</p>
-
-
+        <x-page-header 
+            title="Data User" 
+            subtitle="Berisi daftar pengguna sistem (Guru BK dan Siswa)."
+            icon="ti-users" 
+        />
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <x-alert type="danger">
                 <ul class="mb-0">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </x-alert>
         @endif
 
         <button type="button" class="btn btn-primary m-1 mt-3" data-bs-toggle="modal" data-bs-target="#userModal"
             onclick="resetForm()">
-            Tambah User
+            <i class="ti ti-plus me-1"></i> Tambah User
         </button>
 
         <div class="py-6 text-center">
             <div class="table-responsive">
-                <table id="myTableUser" class="display dt-responsive nowrap" style="width:100%">
+                <table id="myTableUser" class="display dt-responsive nowrap js-datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -152,16 +152,11 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#myTableUser').DataTable();
-        });
-
         function resetForm() {
             document.getElementById('modalTitle').innerText = 'Tambah User';
             document.getElementById('userForm').action = '{{ route("user.store") }}';
