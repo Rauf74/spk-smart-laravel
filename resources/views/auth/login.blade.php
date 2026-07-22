@@ -72,28 +72,13 @@
 
                 {{-- Quick Demo Login Card --}}
                 <div class="card border border-primary border-opacity-25 bg-light mb-4 rounded-3 shadow-none">
-                    <div class="card-body p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="badge bg-primary fw-bold" style="font-size: 0.75rem;">
-                                <i class="ti ti-bolt me-1"></i>Akses Cepat (Demo)
-                            </span>
-                            <span class="text-muted small">1-Click Login</span>
-                        </div>
-                        <p class="text-muted small mb-2" style="font-size: 0.8rem;">
-                            Masuk langsung tanpa ketik password untuk mencoba sistem:
+                    <div class="card-body p-3 text-center">
+                        <p class="text-muted small mb-2" style="font-size: 0.825rem;">
+                            Ingin mencoba aplikasi tanpa ribet mendaftar?
                         </p>
-                        <div class="row g-2 mb-1">
-                            <div class="col-6">
-                                <a href="{{ route('login.quick', 'guru') }}" class="btn btn-primary btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center py-2 shadow-sm">
-                                    <i class="ti ti-user-star me-1 fs-5"></i> Guru BK
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{{ route('login.quick', 'siswa') }}" class="btn btn-success btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center py-2 shadow-sm">
-                                    <i class="ti ti-school me-1 fs-5"></i> Siswa
-                                </a>
-                            </div>
-                        </div>
+                        <button type="button" id="btnQuickLoginDemo" class="btn btn-primary btn-sm w-100 fw-semibold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <i class="ti ti-bolt fs-5 text-warning"></i> Akses Cepat (Demo Quick Login)
+                        </button>
                     </div>
                 </div>
 
@@ -179,7 +164,84 @@
                 });
             @endif
 
-            // Loading saat submit
+            // Handler Quick Login Demo Interactive Popup (Centered SweetAlert2)
+            $('#btnQuickLoginDemo').on('click', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Pilih Peran Demo',
+                    text: 'Silakan pilih peran akun demo yang ingin dibuat:',
+                    icon: 'question',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: '<i class="ti ti-user-star me-1"></i> Guru BK',
+                    confirmButtonColor: '#5D87FF',
+                    denyButtonText: '<i class="ti ti-school me-1"></i> Siswa',
+                    denyButtonColor: '#13DEB9',
+                    cancelButtonText: 'Batal',
+                    customClass: { popup: 'rounded-4' }
+                }).then((result) => {
+                    let chosenRole = null;
+                    if (result.isConfirmed) {
+                        chosenRole = 'guru';
+                    } else if (result.isDenied) {
+                        chosenRole = 'siswa';
+                    }
+                    if (chosenRole) {
+                        // Show loading popup
+                        Swal.fire({
+                            title: '<div class="spinner-border text-primary" role="status"></div>',
+                            html: '<p class="mb-0 text-muted">Membuat akun demo acak...</p>',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            customClass: { popup: 'rounded-4' }
+                        });
+
+                        // AJAX request ke backend
+                        $.ajax({
+                            url: '{{ route("login.quick-generate") }}',
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                role: chosenRole
+                            },
+                            success: function (response) {
+                                if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '🎉 Akun Demo Berhasil Dibuat!',
+                                        html: `
+                                            <p class="text-muted small mb-3">Sistem telah otomatis menghasilkan kredensial berikut:</p>
+                                            <div class="card bg-light border p-3 mb-3 text-start">
+                                                <div class="mb-2"><strong>Nama:</strong> ${response.nama_user}</div>
+                                                <div class="mb-2"><strong>Role:</strong> <span class="badge ${response.role === 'Guru BK' ? 'bg-primary' : 'bg-success'}">${response.role}</span></div>
+                                                <div class="mb-2"><strong>Username:</strong> <code class="fs-5 text-primary fw-bold">${response.username}</code></div>
+                                                <div><strong>Password:</strong> <code class="fs-5 text-danger fw-bold">${response.password}</code></div>
+                                            </div>
+                                            <p class="text-muted small mb-0">Klik tombol di bawah ini untuk langsung menuju ke Dashboard.</p>
+                                        `,
+                                        confirmButtonText: '<i class="ti ti-login me-1"></i> Masuk ke Dashboard',
+                                        confirmButtonColor: '#5D87FF',
+                                        allowOutsideClick: false,
+                                        customClass: { popup: 'rounded-4' }
+                                    }).then(() => {
+                                        window.location.href = response.redirect;
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: 'Terjadi kesalahan saat membuat akun demo. Silakan coba lagi.',
+                                    customClass: { popup: 'rounded-4' }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Loading saat submit form manual
             $('form').on('submit', function (e) {
                 if (this.checkValidity()) {
                     e.preventDefault();

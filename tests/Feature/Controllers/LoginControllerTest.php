@@ -63,4 +63,50 @@ class LoginControllerTest extends TestCase
         $response->assertRedirect('/');
         $this->assertAuthenticatedAs($existingGuru);
     }
+
+    #[Test]
+    public function quick_generate_guru_membuat_user_acak_baru_dan_mengembalikan_json(): void
+    {
+        $response = $this->postJson('/login/quick-generate', [
+            'role' => 'guru',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'nama_user',
+            'username',
+            'password',
+            'role',
+            'redirect',
+        ]);
+
+        $this->assertAuthenticated();
+        $user = Auth::user();
+        $this->assertEquals('Guru BK', $user->role);
+        $this->assertStringStartsWith('guru_', $response->json('username'));
+    }
+
+    #[Test]
+    public function quick_generate_siswa_membuat_user_acak_baru_dan_mengembalikan_json(): void
+    {
+        $response = $this->postJson('/login/quick-generate', [
+            'role' => 'siswa',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'nama_user',
+            'username',
+            'password',
+            'role',
+            'redirect',
+        ]);
+
+        $this->assertAuthenticated();
+        $user = Auth::user();
+        $this->assertEquals('Siswa', $user->role);
+        $this->assertStringStartsWith('siswa_', $response->json('username'));
+    }
 }
