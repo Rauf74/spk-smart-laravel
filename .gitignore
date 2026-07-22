@@ -25,3 +25,5 @@ Thumbs.db
 *.sql
 SECURITY_AUDIT.md
 LOCAL_ROADMAP.md
+/docs/
+
