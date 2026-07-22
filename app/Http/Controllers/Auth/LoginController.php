@@ -35,6 +35,49 @@ class LoginController extends Controller
     }
 
     /**
+     * Quick login demo (Auto generate user jika belum ada di database).
+     */
+    public function quickLogin(Request $request, ?string $role = null)
+    {
+        $targetRole = $role ?? $request->input('role', 'guru');
+        $isSiswa = strtolower($targetRole) === 'siswa';
+
+        if ($isSiswa) {
+            $user = User::where('role', 'Siswa')->first();
+            if (!$user) {
+                $user = User::create([
+                    'nama_user' => 'Siswa Demo',
+                    'username' => 'siswa01',
+                    'password' => Hash::make('password'),
+                    'role' => 'Siswa',
+                    'jenis_kelamin' => 'Laki-laki',
+                    'nis' => '10001',
+                    'is_logged_in' => false,
+                ]);
+            }
+        } else {
+            $user = User::where('role', 'Guru BK')->first();
+            if (!$user) {
+                $user = User::create([
+                    'nama_user' => 'Guru BK Demo',
+                    'username' => 'gurubk',
+                    'password' => Hash::make('password'),
+                    'role' => 'Guru BK',
+                    'jenis_kelamin' => 'Laki-laki',
+                    'is_logged_in' => false,
+                ]);
+            }
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $user->is_logged_in = true;
+        $user->save();
+
+        return redirect()->intended('/')->with('login_success', true);
+    }
+
+    /**
      * Proses login user.
      */
     public function login(Request $request)

@@ -70,6 +70,33 @@
                     <p class="text-muted small mb-0">SMK Muhammadiyah 3 Tangerang Selatan</p>
                 </div>
 
+                {{-- Quick Demo Login Card --}}
+                <div class="card border border-primary border-opacity-25 bg-light mb-4 rounded-3 shadow-none">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary fw-bold" style="font-size: 0.75rem;">
+                                <i class="ti ti-bolt me-1"></i>Akses Cepat (Demo)
+                            </span>
+                            <span class="text-muted small">1-Click Login</span>
+                        </div>
+                        <p class="text-muted small mb-2" style="font-size: 0.8rem;">
+                            Masuk langsung tanpa ketik password untuk mencoba sistem:
+                        </p>
+                        <div class="row g-2 mb-1">
+                            <div class="col-6">
+                                <a href="{{ route('login.quick', 'guru') }}" class="btn btn-primary btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center py-2 shadow-sm">
+                                    <i class="ti ti-user-star me-1 fs-5"></i> Guru BK
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{ route('login.quick', 'siswa') }}" class="btn btn-success btn-sm w-100 fw-semibold d-flex align-items-center justify-content-center py-2 shadow-sm">
+                                    <i class="ti ti-school me-1 fs-5"></i> Siswa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Error Alert --}}
                 @if ($errors->any())
                     <div class="alert alert-danger d-flex align-items-center py-2 mb-3">

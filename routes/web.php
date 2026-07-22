@@ -20,6 +20,7 @@ use App\Http\Controllers\AuditLogController;
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
+Route::match(['get', 'post'], '/login/quick/{role?}', [LoginController::class, 'quickLogin'])->name('login.quick');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [LoginController::class, 'register']);
