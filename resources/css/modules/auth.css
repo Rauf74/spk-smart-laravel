@@ -30,9 +30,9 @@
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(14, 30, 56, 0.72) 0%,
-        rgba(14, 30, 56, 0.30) 50%,
-        rgba(14, 30, 56, 0.65) 100%
+        rgba(14, 30, 56, 0.75) 0%,
+        rgba(14, 30, 56, 0.20) 40%,
+        rgba(14, 30, 56, 0.88) 100%
     );
     z-index: 1;
 }
@@ -71,13 +71,15 @@
     font-weight: 800;
     line-height: 1.25;
     margin-bottom: 8px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);
 }
 .auth-hero-footer p {
     font-size: 0.85rem;
-    opacity: 0.82;
+    color: rgba(255,255,255,0.9);
     line-height: 1.55;
     margin: 0;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
 }
 
 /* ---------- Right: Form panel ---------- */
@@ -132,6 +134,7 @@
     padding: 12px 18px;
     text-align: center;
     margin-bottom: 24px;
+    width: 100%;
     cursor: pointer;
     transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
     display: flex;
