@@ -13,29 +13,42 @@
 </head>
 
 <body>
-    <div class="auth-wrapper">
-        <div class="auth-card card">
-            <div class="card-body p-4 p-md-5">
+    <div class="auth-split">
+
+        {{-- LEFT: Hero Panel --}}
+        <div class="auth-hero">
+            <img src="{{ asset('assets/images/backgrounds/auth-hero.jpg') }}" alt="Siswa SMK Muhammadiyah 3" class="auth-hero-img">
+            <div class="auth-hero-overlay"></div>
+            <div class="auth-hero-content">
+                <div class="auth-hero-brand">
+                    <img src="{{ asset('assets/images/smk3.png') }}" alt="Logo SMK">
+                    <span>SMK Muhammadiyah 3<br>Tangerang Selatan</span>
+                </div>
+                <div class="auth-hero-footer">
+                    <h2>Sistem Pendukung Keputusan Rekomendasi Program Studi</h2>
+                    <p>Membantu siswa menemukan program studi yang tepat berdasarkan minat, bakat, dan potensi akademik melalui metode SMART.</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- RIGHT: Form Panel --}}
+        <div class="auth-panel">
+            <div class="auth-form-inner">
                 {{-- Logo & Header --}}
                 <div class="text-center mb-4">
                     <img src="{{ asset('assets/images/smk3.png') }}" alt="Logo" class="auth-logo mb-3">
-                    <h4 class="fw-bold mb-1">SPK Rekomendasi Program Studi</h4>
-                    <p class="text-muted small mb-0">SMK Muhammadiyah 3 Tangerang Selatan</p>
+                    <h4 class="auth-title">SPK Rekomendasi Program Studi</h4>
+                    <p class="auth-subtitle">Selamat Datang!</p>
                 </div>
 
-                {{-- Quick Demo Login Card --}}
-                <div class="card border border-primary border-opacity-25 bg-light mb-4 rounded-3 shadow-none">
-                    <div class="card-body p-3 text-center">
-                        <p class="text-muted small mb-2" style="font-size: 0.825rem;">
-                            Ingin mencoba aplikasi tanpa ribet mendaftar?
-                        </p>
-                        <button type="button" id="btnQuickLoginDemo"
-                            class="btn btn-primary btn-sm w-100 fw-semibold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
-                            <span class="demo-pulse"></span>
-                            <i class="ti ti-bolt fs-5 text-warning"></i> Akses Cepat (Demo Quick Login)
-                        </button>
-                    </div>
-                </div>
+                {{-- Quick Demo Login Button --}}
+                <button type="button" id="btnQuickLoginDemo" class="quick-demo-banner">
+                    <span class="demo-pulse"></span>
+                    <i class="ti ti-bolt fs-5"></i> Akses Cepat (Demo Quick Login)
+                </button>
+
+                {{-- Divider --}}
+                <div class="auth-divider"><span>atau login dengan akun</span></div>
 
                 {{-- Error Alert --}}
                 @if ($errors->any())
@@ -47,45 +60,40 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="username" class="form-label fw-semibold">Username</label>
                         <div class="input-group">
-                            <span class="input-group-text rounded-start"><i class="ti ti-user"></i></span>
-                            <input type="text" class="form-control rounded-end" id="username" name="username"
-                                placeholder="Masukkan username" value="{{ old('username') }}" required>
+                            <span class="input-group-text"><i class="ti ti-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username"
+                                placeholder="Username" value="{{ old('username') }}" required>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="password" class="form-label fw-semibold">Password</label>
+                    <div class="mb-3">
                         <div class="input-group">
-                            <span class="input-group-text rounded-start"><i class="ti ti-lock"></i></span>
+                            <span class="input-group-text"><i class="ti ti-lock"></i></span>
                             <input type="password" class="form-control border-end-0" id="password" name="password"
-                                placeholder="Masukkan password" required>
-                            <button class="btn btn-toggle-password rounded-end border border-start-0" type="button"
-                                id="togglePassword">
+                                placeholder="Password" required>
+                            <button class="btn btn-toggle-password" type="button" id="togglePassword">
                                 <i class="ti ti-eye" id="toggleIcon"></i>
                             </button>
                         </div>
                     </div>
 
                     <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg fw-semibold py-2">
-                            <i class="ti ti-login me-2"></i>Masuk
+                        <button type="submit" class="btn-auth-submit">
+                            <i class="ti ti-login"></i> Masuk
                         </button>
                     </div>
 
-                    <div class="text-center">
-                        <small class="text-muted">Belum punya akun?</small>
-                        <a href="{{ route('register') }}" class="fw-semibold text-decoration-none ms-1">Daftar</a>
+                    <div class="text-center auth-footer-link">
+                        <span>Belum punya akun?</span>
+                        <a href="{{ route('register') }}">Daftar</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    {{-- =====================================================
-         Quick Login Modal (Custom HTML, no SweetAlert deps)
-         ===================================================== --}}
+    {{-- Quick Login Modal --}}
     <div class="ql-overlay" id="qlOverlay" role="dialog" aria-modal="true" aria-labelledby="qlTitle">
         <div class="ql-modal">
 
@@ -128,16 +136,14 @@
                 <div class="ql-header">
                     <div class="ql-success-icon"><i class="ti ti-check"></i></div>
                     <h5>Akun Demo Siap!</h5>
-                    <p>Kredensial di bawah sudah disalin otomatis. Langsung masuk kapan saja.</p>
+                    <p>Kredensial di bawah bisa disalin. Langsung masuk kapan saja.</p>
                 </div>
 
-                {{-- Copy All strip --}}
                 <div class="ql-copy-all-strip">
                     <span><i class="ti ti-clipboard me-1"></i>Salin semua sekaligus</span>
                     <button class="ql-copy-all-btn" id="qlCopyAll" type="button">Salin Semua</button>
                 </div>
 
-                {{-- Credential card --}}
                 <div class="ql-cred-card">
                     <div class="ql-cred-row">
                         <span class="ql-cred-label">Nama</span>
