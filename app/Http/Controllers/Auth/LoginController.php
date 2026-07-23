@@ -83,48 +83,64 @@ class LoginController extends Controller
      */
     public function quickGenerate(Request $request)
     {
-        $roleInput = $request->input('role', 'guru');
-        $isSiswa = strtolower($roleInput) === 'siswa';
+        try {
+            $roleInput = $request->input('role', 'guru');
+            $isSiswa = strtolower($roleInput) === 'siswa';
 
-        $randomSuffix = Str::lower(Str::random(5));
-        $rawPassword = 'pass' . rand(1000, 9999);
+            $randomSuffix = Str::lower(Str::random(5));
+            $rawPassword = 'pass' . rand(1000, 9999);
 
-        if ($isSiswa) {
-            $rawUsername = 'siswa_' . $randomSuffix;
-            $user = User::create([
-                'nama_user' => 'Siswa Demo #' . rand(100, 999),
-                'username' => $rawUsername,
-                'password' => Hash::make($rawPassword),
-                'role' => 'Siswa',
-                'jenis_kelamin' => 'Laki-laki',
-                'nis' => (string) rand(10000, 99999),
-                'is_logged_in' => false,
+            if ($isSiswa) {
+                $rawUsername = 'siswa_' . $randomSuffix;
+                $user = User::create([
+                    'nama_user' => 'Siswa Demo #' . rand(100, 999),
+                    'username'  => $rawUsername,
+                    'password'  => Hash::make($rawPassword),
+                    'role'      => 'Siswa',
+                    'jenis_kelamin' => 'Laki-laki',
+                    'nis'       => (string) rand(10000, 99999),
+                    'is_logged_in' => false,
+                ]);
+            } else {
+                $rawUsername = 'guru_' . $randomSuffix;
+                $user = User::create([
+                    'nama_user' => 'Guru BK Demo #' . rand(100, 999),
+                    'username'  => $rawUsername,
+                    'password'  => Hash::make($rawPassword),
+                    'role'      => 'Guru BK',
+                    'jenis_kelamin' => 'Laki-laki',
+                    'is_logged_in' => false,
+                ]);
+            }
+
+            Auth::login($user);
+            $request->session()->regenerate();
+            $user->is_logged_in = true;
+            $user->save();
+
+            return response()->json([
+                'status'    => 'success',
+                'nama_user' => $user->nama_user,
+                'username'  => $rawUsername,
+                'password'  => $rawPassword,
+                'role'      => $user->role,
+                'redirect'  => url('/'),
             ]);
-        } else {
-            $rawUsername = 'guru_' . $randomSuffix;
-            $user = User::create([
-                'nama_user' => 'Guru BK Demo #' . rand(100, 999),
-                'username' => $rawUsername,
-                'password' => Hash::make($rawPassword),
-                'role' => 'Guru BK',
-                'jenis_kelamin' => 'Laki-laki',
-                'is_logged_in' => false,
+        } catch (\Throwable $e) {
+            \Log::error('[QuickGenerate] ' . $e->getMessage(), [
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
             ]);
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+                'hint'    => app()->hasDebugModeEnabled()
+                    ? $e->getFile() . ':' . $e->getLine()
+                    : 'Lihat Render logs untuk detail.',
+            ], 500);
         }
-
-        Auth::login($user);
-        $request->session()->regenerate();
-        $user->is_logged_in = true;
-        $user->save();
-
-        return response()->json([
-            'status' => 'success',
-            'nama_user' => $user->nama_user,
-            'username' => $rawUsername,
-            'password' => $rawPassword,
-            'role' => $user->role,
-            'redirect' => url('/'),
-        ]);
     }
 
     /**
