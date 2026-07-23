@@ -20,7 +20,7 @@ use App\Http\Controllers\AuditLogController;
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
-Route::post('/login/quick-generate', [LoginController::class, 'quickGenerate'])->name('login.quick-generate');
+Route::post('/login/quick-generate', [LoginController::class, 'quickGenerate'])->middleware('throttle:10,1')->name('login.quick-generate');
 Route::match(['get', 'post'], '/login/quick/{role?}', [LoginController::class, 'quickLogin'])->name('login.quick');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
