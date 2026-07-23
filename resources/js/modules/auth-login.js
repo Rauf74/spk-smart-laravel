@@ -1,5 +1,11 @@
+/**
+ * Auth Login Module
+ * - Password toggle
+ * - Quick Login Demo modal (custom HTML, 3-step: role → loading → credential)
+ */
 export function initAuthLogin() {
-    // Password toggle
+
+    // ─── Password Toggle ───────────────────────────────────────────
     const toggleBtn = document.getElementById('togglePassword');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', function () {
@@ -17,86 +23,157 @@ export function initAuthLogin() {
         });
     }
 
-    // Quick Login Demo SweetAlert2 Centered Popup
-    const quickLoginBtn = document.getElementById('btnQuickLoginDemo');
-    if (quickLoginBtn && typeof Swal !== 'undefined') {
-        quickLoginBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Pilih Peran Demo',
-                text: 'Silakan pilih peran akun demo yang ingin dibuat:',
-                icon: 'question',
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: '<i class="ti ti-user-star me-1"></i> Guru BK',
-                confirmButtonColor: '#5D87FF',
-                denyButtonText: '<i class="ti ti-school me-1"></i> Siswa',
-                denyButtonColor: '#13DEB9',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'rounded-4' }
-            }).then((result) => {
-                let chosenRole = null;
-                if (result.isConfirmed) {
-                    chosenRole = 'guru';
-                } else if (result.isDenied) {
-                    chosenRole = 'siswa';
-                }
+    // ─── Quick Login Demo Modal ─────────────────────────────────────
+    const overlay    = document.getElementById('qlOverlay');
+    const stepRole   = document.getElementById('qlStepRole');
+    const stepLoad   = document.getElementById('qlStepLoading');
+    const stepOk     = document.getElementById('qlStepSuccess');
 
-                if (chosenRole) {
-                    Swal.fire({
-                        title: '<div class="spinner-border text-primary" role="status"></div>',
-                        html: '<p class="mb-0 text-muted">Membuat akun demo acak...</p>',
-                        allowOutsideClick: false,
-                        showConfirmButton: false,
-                        customClass: { popup: 'rounded-4' }
-                    });
+    if (!overlay) return;  // modal HTML tidak ada, skip
 
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const openBtn    = document.getElementById('btnQuickLoginDemo');
+    const cancelBtn  = document.getElementById('qlBtnCancel');
+    const guruBtn    = document.getElementById('qlBtnGuru');
+    const siswaBtn   = document.getElementById('qlBtnSiswa');
+    const enterBtn   = document.getElementById('qlBtnEnter');
+    const copyAllBtn = document.getElementById('qlCopyAll');
 
-                    fetch('/login/quick-generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ role: chosenRole })
-                    })
-                    .then(res => res.json())
-                    .then(response => {
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '🎉 Akun Demo Berhasil Dibuat!',
-                                html: `
-                                    <p class="text-muted small mb-3">Sistem telah otomatis menghasilkan kredensial berikut:</p>
-                                    <div class="card bg-light border p-3 mb-3 text-start">
-                                        <div class="mb-2"><strong>Nama:</strong> ${response.nama_user}</div>
-                                        <div class="mb-2"><strong>Role:</strong> <span class="badge ${response.role === 'Guru BK' ? 'bg-primary' : 'bg-success'}">${response.role}</span></div>
-                                        <div class="mb-2"><strong>Username:</strong> <code class="fs-5 text-primary fw-bold">${response.username}</code></div>
-                                        <div><strong>Password:</strong> <code class="fs-5 text-danger fw-bold">${response.password}</code></div>
-                                    </div>
-                                    <p class="text-muted small mb-0">Klik tombol di bawah ini untuk langsung menuju ke Dashboard.</p>
-                                `,
-                                confirmButtonText: '<i class="ti ti-login me-1"></i> Masuk ke Dashboard',
-                                confirmButtonColor: '#5D87FF',
-                                allowOutsideClick: false,
-                                customClass: { popup: 'rounded-4' }
-                            }).then(() => {
-                                window.location.href = response.redirect;
-                            });
-                        }
-                    })
-                    .catch(() => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat membuat akun demo. Silakan coba lagi.',
-                            customClass: { popup: 'rounded-4' }
-                        });
-                    });
-                }
-            });
+    let redirectUrl  = '/';
+    let lastUsername = '';
+    let lastPassword = '';
+
+    // Helpers
+    function showStep(step) {
+        [stepRole, stepLoad, stepOk].forEach(s => s?.classList.remove('active'));
+        step?.classList.add('active');
+    }
+
+    function openModal() {
+        showStep(stepRole);
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = '✓ Disalin';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.classList.remove('copied');
+            }, 1800);
+        }).catch(() => {
+            // Fallback untuk browser yang tidak support clipboard API
+            const el = document.createElement('textarea');
+            el.value = text;
+            el.style.position = 'fixed';
+            el.style.opacity = '0';
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const orig = btn.textContent;
+            btn.textContent = '✓ Disalin';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.classList.remove('copied');
+            }, 1800);
         });
     }
+
+    function generateAccount(role) {
+        showStep(stepLoad);
+
+        fetch('/login/quick-generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ role })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status !== 'success') throw new Error(data.message || 'Gagal membuat akun demo.');
+
+            // Simpan untuk copy-all
+            lastUsername = data.username;
+            lastPassword = data.password;
+            redirectUrl  = data.redirect || '/';
+
+            // Isi credential display
+            const isGuru  = data.role === 'Guru BK';
+            const badge   = document.getElementById('qlValRoleBadge');
+            document.getElementById('qlValNama').textContent     = data.nama_user;
+            document.getElementById('qlValUsername').textContent = data.username;
+            document.getElementById('qlValPassword').textContent = data.password;
+            badge.textContent  = data.role;
+            badge.className    = 'ql-cred-badge ' + (isGuru ? 'guru' : 'siswa');
+
+            // Confetti ringan
+            if (typeof confetti !== 'undefined') {
+                confetti({ particleCount: 60, spread: 55, origin: { y: 0.55 }, zIndex: 10000 });
+            }
+
+            showStep(stepOk);
+        })
+        .catch(err => {
+            closeModal();
+            // Fallback ke SweetAlert jika tersedia
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: err.message || 'Terjadi kesalahan. Silakan coba lagi.',
+                    customClass: { popup: 'rounded-4' }
+                });
+            } else {
+                alert('Gagal membuat akun demo: ' + (err.message || 'Coba lagi.'));
+            }
+        });
+    }
+
+    // ─── Event Listeners ──────────────────────────────────────────
+    openBtn?.addEventListener('click', openModal);
+    cancelBtn?.addEventListener('click', closeModal);
+
+    // Tutup saat klik overlay (bukan modal)
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    // Tutup dengan Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+    });
+
+    guruBtn?.addEventListener('click',  () => generateAccount('guru'));
+    siswaBtn?.addEventListener('click', () => generateAccount('siswa'));
+
+    enterBtn?.addEventListener('click', () => {
+        window.location.href = redirectUrl;
+    });
+
+    // Copy individual
+    document.querySelectorAll('.ql-copy-btn[data-target]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const el = document.getElementById(targetId);
+            if (el) copyText(el.textContent.trim(), btn);
+        });
+    });
+
+    // Copy all
+    copyAllBtn?.addEventListener('click', () => {
+        const text = `Username: ${lastUsername}\nPassword: ${lastPassword}`;
+        copyText(text, copyAllBtn);
+    });
 }

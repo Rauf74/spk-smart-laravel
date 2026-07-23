@@ -45,3 +45,352 @@
     background: #fff;
     color: #5D87FF;
 }
+
+/* ===================================================
+   Quick Login Modal — Inline Custom (SPK Brand)
+   =================================================== */
+
+/* Overlay */
+.ql-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(24, 37, 62, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+.ql-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Modal box */
+.ql-modal {
+    width: 100%;
+    max-width: 390px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
+    padding: 28px 24px;
+    transform: translateY(14px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ql-overlay.active .ql-modal {
+    transform: translateY(0) scale(1);
+}
+
+/* Steps */
+.ql-step { display: none; }
+.ql-step.active { display: block; }
+
+/* Header */
+.ql-header { text-align: center; margin-bottom: 20px; }
+.ql-header h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2a3547;
+    margin-bottom: 4px;
+}
+.ql-header p {
+    color: #7c8fac;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+/* Role grid */
+.ql-role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.ql-role-btn {
+    background: #f6f9fc;
+    border: 1.5px solid #e8eef5;
+    border-radius: 14px;
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2a3547;
+    text-align: center;
+}
+.ql-role-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(93,135,255,0.18);
+}
+.ql-role-btn.guru:hover {
+    border-color: #5D87FF;
+    background: rgba(93,135,255,0.06);
+}
+.ql-role-btn.siswa:hover {
+    border-color: #13DEB9;
+    background: rgba(19,222,185,0.06);
+}
+.ql-role-btn:active { transform: scale(0.97); }
+
+.ql-role-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+.ql-role-btn.guru .ql-role-icon {
+    background: rgba(93,135,255,0.12);
+    color: #5D87FF;
+}
+.ql-role-btn.siswa .ql-role-icon {
+    background: rgba(19,222,185,0.12);
+    color: #0aad94;
+}
+.ql-role-label { font-size: 0.83rem; font-weight: 700; }
+.ql-role-desc {
+    font-size: 0.71rem;
+    color: #7c8fac;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+/* Cancel btn */
+.ql-cancel-btn {
+    width: 100%;
+    background: none;
+    border: 1.5px solid #e8eef5;
+    border-radius: 10px;
+    color: #7c8fac;
+    padding: 9px;
+    font-size: 0.81rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.ql-cancel-btn:hover {
+    border-color: #b0bec5;
+    color: #2a3547;
+    background: #f6f9fc;
+}
+
+/* Loading step */
+.ql-loading { text-align: center; padding: 12px 0 20px; }
+.ql-spinner {
+    width: 38px;
+    height: 38px;
+    border: 3px solid #e8eef5;
+    border-top-color: #5D87FF;
+    border-radius: 50%;
+    animation: ql-spin 0.75s linear infinite;
+    margin: 0 auto 14px;
+}
+@keyframes ql-spin { to { transform: rotate(360deg); } }
+.ql-loading h6 {
+    color: #2a3547;
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.ql-loading p {
+    color: #7c8fac;
+    font-size: 0.78rem;
+    margin: 0;
+}
+
+/* Success step */
+.ql-success-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(19,222,185,0.12);
+    border: 1.5px solid rgba(19,222,185,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: #0aad94;
+    font-size: 1.4rem;
+}
+
+/* Credential card */
+.ql-cred-card {
+    background: #f6f9fc;
+    border: 1.5px solid #e8eef5;
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 16px 0;
+}
+.ql-cred-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid #edf2f7;
+    gap: 8px;
+}
+.ql-cred-row:last-child { border-bottom: none; }
+.ql-cred-label {
+    color: #7c8fac;
+    font-size: 0.71rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    min-width: 68px;
+}
+.ql-cred-val-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    justify-content: flex-end;
+}
+.ql-cred-value {
+    color: #2a3547;
+    font-size: 0.87rem;
+    font-weight: 600;
+    font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+}
+.ql-cred-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.ql-cred-badge.guru {
+    background: rgba(93,135,255,0.12);
+    color: #5D87FF;
+}
+.ql-cred-badge.siswa {
+    background: rgba(19,222,185,0.12);
+    color: #0aad94;
+}
+
+/* Copy button */
+.ql-copy-btn {
+    background: none;
+    border: 1px solid #e8eef5;
+    color: #7c8fac;
+    border-radius: 7px;
+    cursor: pointer;
+    padding: 3px 8px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    transition: all 0.18s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.ql-copy-btn:hover {
+    border-color: #5D87FF;
+    color: #5D87FF;
+    background: rgba(93,135,255,0.06);
+}
+.ql-copy-btn.copied {
+    border-color: #13DEB9;
+    color: #0aad94;
+    background: rgba(19,222,185,0.08);
+}
+
+/* Copy all strip */
+.ql-copy-all-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+    background: rgba(93,135,255,0.04);
+    border: 1.5px solid rgba(93,135,255,0.14);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    gap: 8px;
+}
+.ql-copy-all-strip span {
+    color: #5D87FF;
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+.ql-copy-all-btn {
+    background: none;
+    border: 1px solid rgba(93,135,255,0.3);
+    color: #5D87FF;
+    border-radius: 7px;
+    cursor: pointer;
+    padding: 4px 12px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    transition: all 0.18s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.ql-copy-all-btn:hover {
+    background: #5D87FF;
+    color: #fff;
+}
+.ql-copy-all-btn.copied {
+    background: #13DEB9;
+    border-color: #13DEB9;
+    color: #fff;
+}
+
+/* Note */
+.ql-note {
+    color: #7c8fac;
+    font-size: 0.74rem;
+    text-align: center;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+/* Enter dashboard btn */
+.btn-ql-enter {
+    width: 100%;
+    background: #5D87FF;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 4px 16px rgba(93,135,255,0.3);
+}
+.btn-ql-enter:hover {
+    background: #4a73e8;
+    box-shadow: 0 6px 24px rgba(93,135,255,0.45);
+    transform: translateY(-1px);
+}
+.btn-ql-enter:active { transform: scale(0.98); }
+
+/* Pulse dot on quick demo button */
+.demo-pulse {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #13DEB9;
+    animation: pulse-ring 2s ease-out infinite;
+    flex-shrink: 0;
+}
+@keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(19,222,185,0.6); }
+    70%  { box-shadow: 0 0 0 7px rgba(19,222,185,0); }
+    100% { box-shadow: 0 0 0 0 rgba(19,222,185,0); }
+}
